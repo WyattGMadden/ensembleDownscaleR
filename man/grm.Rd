@@ -17,21 +17,15 @@ grm(
   include.additive.annual.resid = T,
   include.multiplicative.weekly.resid = T,
   include.multiplicative.annual.resid = T,
-  nngp = F,
   num_neighbors = 10,
-  discrete.theta.alpha.values = NULL,
-  discrete.theta.beta.values = NULL,
-  discrete.theta.gibbs = T,
   n.iter = 25000,
   burn = 5000,
   thin = 4,
   covariance = "exponential",
   covariance.kernal = NULL,
   matern.nu = 1.5,
-  tau.alpha.tune = 0.2,
   tau.alpha.a = 0.5,
   tau.alpha.b = 0.005,
-  tau.beta.tune = 0.2,
   tau.beta.a = 0.5,
   tau.beta.b = 0.005,
   omega.a = 0.5,
@@ -77,15 +71,7 @@ grm(
 
 \item{include.multiplicative.annual.resid}{Include multiplicative spatial (weekly) residual bias not explained by other inputes}
 
-\item{nngp}{Use nearest neighbor Gaussian process (NNGP) in place of Gaussian process}
-
 \item{num_neighbors}{Number of nearest neighbors to use in NNGP}
-
-\item{discrete.theta.alpha.values}{Values of theta (GP intercept range parameter) to use in discrete uniform prior. If NULL (default) continuous theta prior is used}
-
-\item{discrete.theta.beta.values}{Values of theta (GP slope range parameter) to use in discrete uniform prior. If NULL (default) continuous theta prior is used}
-
-\item{discrete.theta.gibbs}{If TRUE, use Gibbs sampling to sample theta.alpha and theta.beta. If FALSE, use Metropolis-Hastings (jump's to nearest discrete values)}
 
 \item{n.iter}{Number of iterations used in predictions.}
 
@@ -99,13 +85,9 @@ grm(
 
 \item{matern.nu}{Specify nu parameter for Matern covariance function if used (from 0.5, 1.5, and 2.5)}
 
-\item{tau.alpha.tune}{Tau alpha Metropolis-Hastings proposal tuning parameter, only used if nngp = T}
-
 \item{tau.alpha.a}{First tau alpha prior hyperparameter}
 
 \item{tau.alpha.b}{Second tau alpha prior hyperparameter}
-
-\item{tau.beta.tune}{Tau beta Metropolis-Hastings proposal tuning parameter, only used if nngp = T}
 
 \item{tau.beta.a}{First tau beta prior hyperparameter}
 

@@ -37,89 +37,87 @@ devtools::install_github("WyattGMadden/ensembleDownscaleR")
 ```{r example-stage-1, eval = F}
 library(ensembleDownscaleR)
 
-?ctm_pm25
+?cmaq_aqs_matched
 
-ctm_fit <- grm(Y = ctm_pm25$pm25,
-               X = ctm_pm25$ctm,
-               L = ctm_pm25[, c("elevation", "forestcover",
+ctm_fit <- grm(Y = cmaq_aqs_matched$pm25,
+               X = cmaq_aqs_matched$ctm,
+               L = cmaq_aqs_matched[, c("elevation", "forestcover",
                                 "hwy_length", "lim_hwy_length", 
                                 "local_rd_length", "point_emi_any")],
-               M = ctm_pm25[, c("tmp", "wind")],
+               M = cmaq_aqs_matched[, c("tmp", "wind")],
                n.iter = 100,
                burn = 20,
                thin = 1,
-               nngp = T,
                covariance = "matern",
                matern.nu = 0.5,
-               coords = ctm_pm25[, c("x", "y")],
-               space.id = ctm_pm25$space_id,
-               time.id = ctm_pm25$time_id,
-               spacetime.id = ctm_pm25$spacetime_id,
+               coords = cmaq_aqs_matched[, c("x", "y")],
+               space.id = cmaq_aqs_matched$space_id,
+               time.id = cmaq_aqs_matched$time_id,
+               spacetime.id = cmaq_aqs_matched$spacetime_id,
                verbose.iter = 10)
 
 
 
 
-cv_id_ctm_ord <- create_cv(space.id = ctm_pm25$space_id,
-                           time.id = ctm_pm25$time_id, 
+cv_id_ctm_ord <- create_cv(space.id = cmaq_aqs_matched$space_id,
+                           time.id = cmaq_aqs_matched$time_id, 
                            type = "ordinary")
 
 
 
-ctm_fit_cv <- grm_cv(Y = ctm_pm25$pm25,
-                     X = ctm_pm25$ctm,
+ctm_fit_cv <- grm_cv(Y = cmaq_aqs_matched$pm25,
+                     X = cmaq_aqs_matched$ctm,
                      cv.object = cv_id_ctm_ord,
-                     L = ctm_pm25[, c("elevation", "forestcover",
+                     L = cmaq_aqs_matched[, c("elevation", "forestcover",
                                       "hwy_length", "lim_hwy_length", 
                                       "local_rd_length", "point_emi_any")],
-                     M = ctm_pm25[, c("tmp", "wind")],
+                     M = cmaq_aqs_matched[, c("tmp", "wind")],
                      n.iter = 500,
                      burn = 100,
                      thin = 4,
-                     coords = ctm_pm25[, c("x", "y")],
-                     space.id = ctm_pm25$space_id,
-                     time.id = ctm_pm25$time_id,
-                     spacetime.id = ctm_pm25$spacetime_id)
+                     coords = cmaq_aqs_matched[, c("x", "y")],
+                     space.id = cmaq_aqs_matched$space_id,
+                     time.id = cmaq_aqs_matched$time_id,
+                     spacetime.id = cmaq_aqs_matched$spacetime_id)
 
 
-?maia_pm25
+?modis_aqs_matched
 
-cv_id_maia_ord <- create_cv(space.id = maia_pm25$space_id,
-                            time.id = maia_pm25$time_id,
+cv_id_maia_ord <- create_cv(space.id = modis_aqs_matched$space_id,
+                            time.id = modis_aqs_matched$time_id,
                             type = "ordinary")
 
-maia_fit <- grm(Y = maia_pm25$pm25,
-                X = maia_pm25$aod,
-                L = maia_pm25[, c("elevation", "forestcover",
+maia_fit <- grm(Y = modis_aqs_matched$pm25,
+                X = modis_aqs_matched$aod,
+                L = modis_aqs_matched[, c("elevation", "forestcover",
                                   "hwy_length", "lim_hwy_length", 
                                   "local_rd_length", "point_emi_any")],
-                M = maia_pm25[, c("tmp", "wind", "cmaq", "tempaod", 
+                M = modis_aqs_matched[, c("tmp", "wind", "cmaq", "tempaod", 
                                   "windaod", "elevationaod")],
                 n.iter = 500,
-                nngp = T,
                 num_neighbors = 6,
                 burn = 100,
                 thin = 4,
-                coords = maia_pm25[, c("x", "y")],
-                space.id = maia_pm25$space_id,
-                time.id = maia_pm25$time_id,
-                spacetime.id = maia_pm25$spacetime_id)
+                coords = modis_aqs_matched[, c("x", "y")],
+                space.id = modis_aqs_matched$space_id,
+                time.id = modis_aqs_matched$time_id,
+                spacetime.id = modis_aqs_matched$spacetime_id)
 
-maia_fit_cv <- grm_cv(Y = maia_pm25$pm25,
-                      X = maia_pm25$aod,
+maia_fit_cv <- grm_cv(Y = modis_aqs_matched$pm25,
+                      X = modis_aqs_matched$aod,
                       cv.object = cv_id_maia_ord,
-                      L = maia_pm25[, c("elevation", "forestcover",
+                      L = modis_aqs_matched[, c("elevation", "forestcover",
                                         "hwy_length", "lim_hwy_length", 
                                         "local_rd_length", "point_emi_any")],
-                      M = maia_pm25[, c("tmp", "wind", "cmaq", "tempaod", 
+                      M = modis_aqs_matched[, c("tmp", "wind", "cmaq", "tempaod", 
                                         "windaod", "elevationaod")],
                       n.iter = 500,
                       burn = 100,
                       thin = 4,
-                      coords = maia_pm25[, c("x", "y")],
-                      space.id = maia_pm25$space_id,
-                      time.id = maia_pm25$time_id,
-                      spacetime.id = maia_pm25$spacetime_id)
+                      coords = modis_aqs_matched[, c("x", "y")],
+                      space.id = modis_aqs_matched$space_id,
+                      time.id = modis_aqs_matched$time_id,
+                      spacetime.id = modis_aqs_matched$spacetime_id)
 ```
 
 
@@ -128,20 +126,20 @@ maia_fit_cv <- grm_cv(Y = maia_pm25$pm25,
 
 
 ```{r example-stage-2, eval = F}
-?ctm_preds
+?cmaq_full
 
 ctm_pred <- grm_pred(grm.fit = ctm_fit,
-                     X.pred = ctm_preds$ctm,
-                     L.pred = ctm_preds[, c("elevation", "forestcover",
+                     X.pred = cmaq_full$ctm,
+                     L.pred = cmaq_full[, c("elevation", "forestcover",
                                             "hwy_length", "lim_hwy_length", 
                                             "local_rd_length", "point_emi_any")],
-                     M.pred = ctm_preds[, c("tmp", "wind")],
-                     coords.Y = ctm_pm25[, c("x", "y")],
-                     space.id.Y = ctm_pm25$space_id,
-                     coords.pred = ctm_preds[, c("x", "y")],
-                     space.id = ctm_preds$space_id,
-                     time.id = ctm_preds$time_id,
-                     spacetime.id = ctm_preds$spacetime_id,
+                     M.pred = cmaq_full[, c("tmp", "wind")],
+                     coords.Y = cmaq_aqs_matched[, c("x", "y")],
+                     space.id.Y = cmaq_aqs_matched$space_id,
+                     coords.pred = cmaq_full[, c("x", "y")],
+                     space.id = cmaq_full$space_id,
+                     time.id = cmaq_full$time_id,
+                     spacetime.id = cmaq_full$spacetime_id,
                      include.additive.annual.resid = T,
                      include.multiplicative.annual.resid = T,
                      n.iter = 20,
@@ -149,21 +147,21 @@ ctm_pred <- grm_pred(grm.fit = ctm_fit,
 
 
 
-?maia_preds
+?modis_full
 
 maia_pred <- grm_pred(grm.fit = maia_fit,
-                      X.pred = maia_preds$aod, 
-                      L.pred = maia_preds[, c("elevation", "forestcover",
+                      X.pred = modis_full$aod, 
+                      L.pred = modis_full[, c("elevation", "forestcover",
                                               "hwy_length", "lim_hwy_length", 
                                               "local_rd_length", "point_emi_any")],
-                      M.pred = maia_preds[, c("tmp", "wind", "cmaq", "tempaod", 
+                      M.pred = modis_full[, c("tmp", "wind", "cmaq", "tempaod", 
                                               "windaod", "elevationaod")],
-                      coords.Y = maia_pm25[, c("x", "y")],
-                      space.id.Y = maia_pm25$space_id,
-                      coords.pred = maia_preds[, c("x", "y")],
-                      space.id = maia_preds$space_id, 
-                      time.id = maia_preds$time_id, 
-                      spacetime.id = maia_preds$spacetime_id,
+                      coords.Y = modis_aqs_matched[, c("x", "y")],
+                      space.id.Y = modis_aqs_matched$space_id,
+                      coords.pred = modis_full[, c("x", "y")],
+                      space.id = modis_full$space_id, 
+                      time.id = modis_full$time_id, 
+                      spacetime.id = modis_full$spacetime_id,
                       include.additive.annual.resid = T,
                       include.multiplicative.annual.resid = T,
                       n.iter = 100,
@@ -177,10 +175,10 @@ maia_pred <- grm_pred(grm.fit = maia_fit,
 
 ensemble_fit <- ensemble_spatial(grm.fit.cv.1 = ctm_fit_cv,
                                  grm.fit.cv.2 = maia_fit_cv,
-                                 date.Y.1 = ctm_pm25$date,
-                                 date.Y.2 = maia_pm25$date,
-                                 coords.Y.1 = ctm_pm25[, c("x", "y")],
-                                 space.id.Y.1 = ctm_pm25$space_id,
+                                 date.Y.1 = cmaq_aqs_matched$date,
+                                 date.Y.2 = modis_aqs_matched$date,
+                                 coords.Y.1 = cmaq_aqs_matched[, c("x", "y")],
+                                 space.id.Y.1 = cmaq_aqs_matched$space_id,
                                  n.iter = 5000, 
                                  burn = 1000, 
                                  thin = 4,
@@ -199,16 +197,16 @@ ensemble_fit <- ensemble_spatial(grm.fit.cv.1 = ctm_fit_cv,
 ```{r example-stage-4, eval = F}
 
 weight_preds <- weight_pred(ensemble.fit = ensemble_fit,
-                            coords.Y.1 = ctm_pm25[, c("x", "y")], 
-                            space.id.Y.1 = ctm_pm25$space_id, 
-                            coords.pred.1 = ctm_preds[, c("x", "y")],
-                            space.id.pred.1 = ctm_preds$space_id)
+                            coords.Y.1 = cmaq_aqs_matched[, c("x", "y")], 
+                            space.id.Y.1 = cmaq_aqs_matched$space_id, 
+                            coords.pred.1 = cmaq_full[, c("x", "y")],
+                            space.id.pred.1 = cmaq_full$space_id)
 
 
 results <- gap_fill(grm.pred.1 = ctm_pred,
                     grm.pred.2 = maia_pred,
-                    date.pred.1 = ctm_preds$date,
-                    date.pred.2 = maia_preds$date, 
+                    date.pred.1 = cmaq_full$date,
+                    date.pred.2 = modis_full$date, 
                     space.id = ctm_pred$space.id, 
                     weights = weight_preds)
 
