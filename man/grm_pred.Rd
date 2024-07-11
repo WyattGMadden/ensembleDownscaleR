@@ -7,8 +7,8 @@
 grm_pred(
   grm.fit,
   X.pred,
-  L.pred,
-  M.pred,
+  L.pred = NULL,
+  M.pred = NULL,
   coords.Y,
   space.id.Y,
   coords.pred,

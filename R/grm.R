@@ -365,10 +365,10 @@ grm <- function(Y,
         alpha_space[Z_ID] +
         beta_space[Z_ID] * X
 
-    if (!is.null(L)) {
+    if (!is.null(L)) {
         MMM <- MMM + L %*% gamma
     }
-    if (!is.null(M)) {
+    if (!is.null(M)) {
         MMM <- MMM + M %*% delta
     }
     
@@ -390,11 +390,17 @@ grm <- function(Y,
     alpha0.save <- rep(NA, K)
     beta0.save <- rep(NA, K)
     
-    gamma.save <- matrix(NA, nrow = K, ncol = length(gamma))
-    delta.save <- matrix(NA, nrow = K, ncol = length(delta))
-    
-    lambda_gamma.save <- rep(NA, K)
-    lambda_delta.save <- rep(NA, K)
+    gamma.save <- NULL
+    if (!is.null(L)) {
+        gamma.save <- matrix(NA, nrow = K, ncol = length(gamma))
+        lambda_gamma.save <- rep(NA, K)
+    }
+
+    delta.save <- NULL
+    if (!is.null(M)) {
+        delta.save <- matrix(NA, nrow = K, ncol = length(delta))
+        lambda_delta.save <- rep(NA, K)
+    }
     
     alpha_time.save <- matrix(NA, nrow = K, ncol = N.time)
     beta_time.save <- matrix(NA, nrow = K, ncol = N.time)
@@ -685,11 +691,17 @@ grm <- function(Y,
   
             alpha0.save[k] = alpha0
             beta0.save[k] = beta0
-            gamma.save[k, ] = gamma
-            delta.save[k, ] = delta
+
+            if (!is.null(L)) {
+                gamma.save[k, ] <- gamma
+                lambda_gamma.save[k] <- lambda_gamma
+            }
+
+            if (!is.null(M)) {
+                delta.save[k, ] <- delta
+                lambda_delta.save[k] <- lambda_delta
+            }
        
-            lambda_gamma.save[k] = lambda_gamma
-            lambda_delta.save[k] = lambda_delta
        
             alpha_time.save[k,] = alpha_time
             beta_time.save[k,] = beta_time
@@ -719,10 +731,15 @@ grm <- function(Y,
     }
 
     ##Process for output
-    delta.save = data.frame(delta.save)
-    names(delta.save) = colnames(M)
-    gamma.save = data.frame(gamma.save);
-    names(gamma.save) = colnames(L)
+    if (!is.null(L)) {
+        gamma.save <- data.frame(gamma.save)
+        names(gamma.save) <- colnames(L)
+    }
+
+    if (!is.null(M)) {
+        delta.save <- data.frame(delta.save)
+        names(delta.save) <- colnames(M)
+    }
     
     alpha_time.save = data.frame(time.id = 1:N.time, t(alpha_time.save))
     names(alpha_time.save) = c("time.id", 
@@ -750,8 +767,6 @@ grm <- function(Y,
     other.save = data.frame(alpha0 = alpha0.save, 
                             beta0 = beta0.save,
                             sigma2 = sigma2.save,
-                            lambda.delta = lambda_delta.save, 
-                            lambda.gamma = lambda_gamma.save,
                             theta.alpha = theta_alpha.save, 
                             theta.beta = theta_beta.save, 
                             tau.alpha = tau_alpha.save, 
@@ -761,19 +776,33 @@ grm <- function(Y,
                             omega.alpha = omega_alpha.save, 
                             omega.beta = omega_beta.save,
                             dev = LL.save)
+
+    if (!is.null(L)) {
+        other.save$lambda.gamma <- lambda_gamma.save
+    }
+    if (!is.null(M)) {
+        other.save$lambda.delta <- lambda_delta.save
+    }   
     
     standardize.param = rbind(data.frame(Type = "X", 
                                          Name = "AOD/CTM", 
                                          Mean = X.mean, 
-                                         SD = X.sd),
-                               data.frame(Type = "L", 
-                                          Name = colnames(L), 
-                                          Mean = L.mean, 
-                                          SD = L.sd), 
-                               data.frame(Type = "M", 
-                                          Name = colnames(M), 
-                                          Mean = M.mean, 
-                                          SD = M.sd))
+                                         SD = X.sd))
+    if (!is.null(L)) {
+        standardize.param <- rbind(standardize.param, 
+                                  data.frame(Type = "L", 
+                                             Name = colnames(L), 
+                                             Mean = L.mean, 
+                                             SD = L.sd))
+    }
+    if (!is.null(M)) {
+        standardize.param <- rbind(standardize.param, 
+                                  data.frame(Type = "M", 
+                                             Name = colnames(M), 
+                                             Mean = M.mean, 
+                                             SD = M.sd))
+    }
+
     row.names(standardize.param) = NULL
 
     

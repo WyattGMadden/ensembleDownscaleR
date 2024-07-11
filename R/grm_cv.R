@@ -93,12 +93,20 @@ grm_cv <- function(Y,
         X.test <- X[test.id]
     
         #Subset of L matrix based on variable s
-        L <- as.matrix(L)
-        L.train <- L[train.id, , drop = FALSE]
-        L.test <- L[test.id, , drop = FALSE]
-        M <- as.matrix(M)
-        M.train <- M[train.id, , drop = FALSE]
-        M.test <- M[test.id, , drop = FALSE]
+        L.train <- NULL
+        L.test <- NULL
+        if (!is.null(L)) {
+            L <- as.matrix(L)
+            L.train <- L[train.id, , drop = FALSE]
+            L.test <- L[test.id, , drop = FALSE]
+        }
+        M.train <- NULL
+        M.test <- NULL
+        if (!is.null(M)) {
+            M <- as.matrix(M)
+            M.train <- M[train.id, , drop = FALSE]
+            M.test <- M[test.id, , drop = FALSE]
+        }
     
         space.id.train <- space.id[train.id]
         space.id.test <- space.id[test.id]
