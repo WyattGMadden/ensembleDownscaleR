@@ -358,13 +358,19 @@ grm <- function(Y,
     }
     
     ###Initialize mean
-    MMM <- alpha0 + beta0 * X + 
-        L %*% gamma + 
-        M %*% delta + 
-        alpha_time[time.id] + 
-        beta_time[time.id] * X + 
-        alpha_space[Z_ID] + 
+    ###Initialize mean
+    MMM <- alpha0 + beta0 * X +
+        alpha_time[time.id] +
+        beta_time[time.id] * X +
+        alpha_space[Z_ID] +
         beta_space[Z_ID] * X
+
+    if (!is.null(L)) {
+        MMM <- MMM + L %*% gamma
+    }
+    if (!is.null(M)) {
+        MMM <- MMM + M %*% delta
+    }
     
     ###Initializae sigma2
     sigma2 <- stats::var(as.numeric(Y - MMM), na.rm = T)
