@@ -2,12 +2,13 @@
 ###STAGE 1###
 
 #cmaq 
-Y.input.cmaq <- read.csv("../../onedrive_code/Stage 1 Input Data/CTM/Y.csv")
-X.input.cmaq <- read.csv("../../onedrive_code/Stage 1 Input Data/CTM/X.csv")
-L.input.cmaq <- as.matrix(read.csv("../../onedrive_code/Stage 1 Input Data/CTM/L.csv"))
-M.input.cmaq <- as.matrix(read.csv ("../../onedrive_code/Stage 1 Input Data/CTM/M.csv"))
-monitor.locs.cmaq <- as.matrix(read.csv("../../onedrive_code/Stage 1 Input Data/CTM/Monitor_XY.csv"))
-cmaq.dateinfo <- read.csv("../../onedrive_code/Stage 3 Input Data/CTM_Date_Mon_ID.csv")
+rel_loc <- "~/Documents/school/emory/research/chang/nasa/code/onedrive_code/"
+Y.input.cmaq <- read.csv(paste0(rel_loc, "Stage 1 Input Data/CTM/Y.csv"))
+X.input.cmaq <- read.csv(paste0(rel_loc, "Stage 1 Input Data/CTM/X.csv"))
+L.input.cmaq <- as.matrix(read.csv(paste0(rel_loc, "Stage 1 Input Data/CTM/L.csv")))
+M.input.cmaq <- as.matrix(read.csv(paste0(rel_loc, "Stage 1 Input Data/CTM/M.csv")))
+monitor.locs.cmaq <- as.matrix(read.csv(paste0(rel_loc, "Stage 1 Input Data/CTM/Monitor_XY.csv")))
+cmaq.dateinfo <- read.csv(paste0(rel_loc, "Stage 3 Input Data/CTM_Date_Mon_ID.csv"))
 
 cmaq_aqs_matched <- Y.input.cmaq
 cmaq_aqs_matched$ctm <- X.input.cmaq$CTM
@@ -55,12 +56,12 @@ usethis::use_data(cmaq_aqs_matched, overwrite = TRUE)
 
 
 #modis
-Y.input.modis <- read.csv("../../onedrive_code/Stage 1 Input Data/MAIA/Y.csv")
-X.input.modis <- read.csv("../../onedrive_code/Stage 1 Input Data/MAIA/X.csv")
-L.input.modis <- as.matrix(read.csv("../../onedrive_code/Stage 1 Input Data/MAIA/L.csv"))
-M.input.modis <- as.matrix(read.csv ("../../onedrive_code/Stage 1 Input Data/MAIA/M.csv"))
-monitor.locs.modis <- as.matrix(read.csv("../../onedrive_code/Stage 1 Input Data/MAIA/Monitor_XY.csv"))
-modis.dateinfo <- read.csv("../../onedrive_code/Stage 3 Input Data/MAIA_Date_Mon_ID.csv")
+Y.input.modis <- read.csv(paste0(rel_loc, "Stage 1 Input Data/MAIA/Y.csv"))
+X.input.modis <- read.csv(paste0(rel_loc, "Stage 1 Input Data/MAIA/X.csv"))
+L.input.modis <- as.matrix(read.csv(paste0(rel_loc, "Stage 1 Input Data/MAIA/L.csv")))
+M.input.modis <- as.matrix(read.csv(paste0(rel_loc, "Stage 1 Input Data/MAIA/M.csv")))
+monitor.locs.modis <- as.matrix(read.csv(paste0(rel_loc, "Stage 1 Input Data/MAIA/Monitor_XY.csv")))
+modis.dateinfo <- read.csv(paste0(rel_loc, "Stage 3 Input Data/MAIA_Date_Mon_ID.csv"))
 
 modis_aqs_matched <- Y.input.modis
 modis_aqs_matched$aod <- X.input.modis$aod
@@ -110,11 +111,11 @@ usethis::use_data(modis_aqs_matched, overwrite = TRUE)
 ###STAGE 2###
 
 #cmaq
-pred.locs.cmaq <- as.matrix(read.csv("../../onedrive_code/Stage 2 Input data/CTM/Cell_XY.csv"))
-L.pred.cmaq <- as.matrix(read.csv("../../onedrive_code/Stage 2 Input data/CTM/L.csv"))
-M.pred.cmaq <- as.matrix(read.csv("../../onedrive_code/Stage 2 Input data/CTM/M.csv"))
-X.pred.cmaq <- read.csv("../../onedrive_code/Stage 2 Input data/CTM/X.csv")
-cmaq.dateinfo.pred <- read.csv ("../../onedrive_code/Stage 4 Input Data/CTM_Pred_Date_Cell_ID.csv")
+pred.locs.cmaq <- as.matrix(read.csv(paste0(rel_loc, "Stage 2 Input Data/CTM/Cell_XY.csv")))
+L.pred.cmaq <- as.matrix(read.csv(paste0(rel_loc, "Stage 2 Input Data/CTM/L.csv")))
+M.pred.cmaq <- as.matrix(read.csv(paste0(rel_loc, "Stage 2 Input Data/CTM/M.csv")))
+X.pred.cmaq <- read.csv(paste0(rel_loc, "Stage 2 Input Data/CTM/X.csv"))
+cmaq.dateinfo.pred <- read.csv(paste0(rel_loc, "Stage 4 Input Data/CTM_Pred_Date_Cell_ID.csv"))
 
 cmaq_full <- X.pred.cmaq
 
@@ -151,11 +152,11 @@ usethis::use_data(cmaq_full, overwrite = TRUE)
 
 
 #modis
-pred.locs.modis = as.matrix(read.csv("../../onedrive_code/Stage 2 Input data/MAIA/Cell_XY.csv"))
-L.pred.modis = as.matrix(read.csv("../../onedrive_code/Stage 2 Input data/MAIA/L.csv"))
-M.pred.modis = as.matrix(read.csv("../../onedrive_code/Stage 2 Input data/MAIA/M.csv"))
-X.pred.modis = read.csv("../../onedrive_code/Stage 2 Input data/MAIA/X.csv")
-modis.dateinfo.pred <- read.csv("../../onedrive_code/Stage 4 Input Data/MAIA_Pred_Date_Cell_ID.csv")
+pred.locs.modis = as.matrix(read.csv(paste0(rel_loc, "Stage 2 Input Data/MAIA/Cell_XY.csv")))
+L.pred.modis = as.matrix(read.csv(paste0(rel_loc, "Stage 2 Input Data/MAIA/L.csv")))
+M.pred.modis = as.matrix(read.csv(paste0(rel_loc, "Stage 2 Input Data/MAIA/M.csv")))
+X.pred.modis = read.csv(paste0(rel_loc, "Stage 2 Input Data/MAIA/X.csv"))
+modis.dateinfo.pred <- read.csv(paste0(rel_loc, "Stage 4 Input Data/MAIA_Pred_Date_Cell_ID.csv"))
 
 modis_full <- X.pred.modis
 

@@ -37,7 +37,7 @@ remotes::install_github("WyattGMadden/ensembleDownscaleR")
 ```{r example-stage-1, eval = F}
 library(ensembleDownscaleR)
 
-?cmaq_aqs_matched
+?monitor_pm25_with_cmaq
 
 ctm_fit <- grm(Y = cmaq_aqs_matched$pm25,
                X = cmaq_aqs_matched$ctm,
