@@ -121,9 +121,6 @@ grm_pred <- function(grm.fit,
         N.mon <- nrow(locations.Y)
         N.cell <- nrow(locations.pred)
 
-        ####Predict alpha and beta at grid cells
-#        XY <- rbind(locations.Y, locations.pred)
-#        D22 <- as.matrix(stats::dist(locations.Y, diag = TRUE, upper = TRUE))
         
         ####Predict alpha and beta at grid cells
         XY <- rbind(locations.Y, locations.pred)
