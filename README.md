@@ -15,7 +15,7 @@ The goal of ensembleDownscaleR is to …
 You can install the development version of ensembleDownscaleR like so:
 
 ``` r
-devtools::install_github("WyattGMadden/ensembleDownscaleR")
+remotes::install_github("WyattGMadden/ensembleDownscaleR")
 ```
 
 ## Example

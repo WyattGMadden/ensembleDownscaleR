@@ -118,13 +118,12 @@ grm_pred <- function(grm.fit,
         dist_dat_pred <- dist_dat_pred[order(dist_dat_pred$space.id), ]
         locations.pred <- dist_dat_pred[, c("x", "y")]
 
-        N.mon <- nrow(locations.Y)
         N.cell <- nrow(locations.pred)
         
         ####Predict alpha and beta at grid cells
         XY <- rbind(locations.Y, locations.pred)
         D22 <- as.matrix(stats::dist(locations.Y, diag = TRUE, upper = TRUE))
-        D12 <- as.matrix(stats::dist(XY, diag = TRUE, upper = TRUE))[c(1:N.mon), -c(1:N.mon)]
+        D12 <- calculate_distances(locations.Y, locations.pred)
         
         alpha_space_pred <- data.frame(expand.grid(1:N.space, 
                                                    1:N.spacetime))

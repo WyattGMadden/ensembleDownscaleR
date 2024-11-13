@@ -37,7 +37,7 @@ remotes::install_github("WyattGMadden/ensembleDownscaleR")
 ```{r example-stage-1, eval = F}
 library(ensembleDownscaleR)
 
-?monitor_pm25_with_cmaq
+?cmaq_aqs_matched
 
 ctm_fit <- grm(Y = cmaq_aqs_matched$pm25,
                X = cmaq_aqs_matched$ctm,
@@ -166,6 +166,7 @@ maia_pred <- grm_pred(grm.fit = maia_fit,
                       include.multiplicative.annual.resid = T,
                       n.iter = 100,
                       verbose = T)
+
 ```
 
 
