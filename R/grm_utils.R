@@ -14,26 +14,29 @@ covariate_matrix_standardize <- function(x) {
   return(list(x = x, x.mean = x.mean, x.sd = x.sd))
 }
 
-# Calculate distances 
+# Function to calculate Euclidean distances between two sets of coordinates
 calculate_distances <- function(coords1, coords2) {
-  # Expand the coordinates in each matrix
-  x1 <- matrix(rep(coords1[, "x"], 
-                   each = nrow(coords2)), 
-               nrow = nrow(coords1), 
-               ncol = nrow(coords2))
-  y1 <- matrix(rep(coords1[, "y"], 
-                   each = nrow(coords2)), 
-               nrow = nrow(coords1), 
-               ncol = nrow(coords2))
-  x2 <- matrix(rep(coords2[, "x"], 
-                   times = nrow(coords1)), 
-               nrow = nrow(coords1), 
-               ncol = nrow(coords2))
-  y2 <- matrix(rep(coords2[, "y"], 
-                   times = nrow(coords1)), 
-               nrow = nrow(coords1), 
-               ncol = nrow(coords2))
+  # Ensure that coords1 and coords2 are matrices
+  if (!is.matrix(coords1)) {
+    coords1 <- as.matrix(coords1)
+  }
+  if (!is.matrix(coords2)) {
+    coords2 <- as.matrix(coords2)
+  }
+
+  # Number of points in each set
+  n1 <- nrow(coords1)
+  n2 <- nrow(coords2)
+  
+  # Initialize the distance matrix
+  distance_matrix <- matrix(0, nrow = n1, ncol = n2)
   
   # Compute distances
-  sqrt((x1 - x2)^2 + (y1 - y2)^2)
+  for (i in 1:n1) {
+    for (j in 1:n2) {
+      distance_matrix[i, j] <- sqrt(sum((coords1[i, ] - coords2[j, ]) ^ 2))
+    }
+  }
+  
+  return(distance_matrix)
 }

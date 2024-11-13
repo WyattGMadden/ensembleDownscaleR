@@ -118,13 +118,19 @@ grm_pred <- function(grm.fit,
         dist_dat_pred <- dist_dat_pred[order(dist_dat_pred$space.id), ]
         locations.pred <- dist_dat_pred[, c("x", "y")]
 
+        N.mon <- nrow(locations.Y)
         N.cell <- nrow(locations.pred)
+
+        ####Predict alpha and beta at grid cells
+#        XY <- rbind(locations.Y, locations.pred)
+#        D22 <- as.matrix(stats::dist(locations.Y, diag = TRUE, upper = TRUE))
         
         ####Predict alpha and beta at grid cells
         XY <- rbind(locations.Y, locations.pred)
         D22 <- as.matrix(stats::dist(locations.Y, diag = TRUE, upper = TRUE))
         D12 <- calculate_distances(locations.Y, locations.pred)
-        
+
+
         alpha_space_pred <- data.frame(expand.grid(1:N.space, 
                                                    1:N.spacetime))
         beta_space_pred <- data.frame(expand.grid(1:N.space, 
@@ -157,20 +163,28 @@ grm_pred <- function(grm.fit,
               Sigma12.m <- tau.m * cov_kern(distance = D12, 
                                            theta = theta.m)
 
-              if (is.null(grm.fit$discrete.theta.alpha.info)) {
-                  Sigma22.m <- tau.m * cov_kern(distance = D22, 
-                                               theta = theta.m)
-                  InvSigma22.m <- solve(Sigma22.m)
-              } else {
-                  which.theta.alpha <- grm.fit$discrete.theta.alpha.info$which.theta.alpha.discrete[m]
-                  InvSigma22.m <- (1 / tau.m) * grm.fit$discrete.theta.alpha.info$kernals.inv.alpha[[which.theta.alpha]]
-              }
+              Sigma22.m <- tau.m * cov_kern(distance = D22, 
+                                            theta = theta.m)
+              InvSigma22.m <- solve(Sigma22.m)
         
               for (j in 1:N.spacetime) {
                   alpha.m <- grm.fit$alpha.space[grm.fit$alpha.space$spacetime.id == j, 
                                                 paste0("Sample", m)]
                   alpha.mu.m <- t(Sigma12.m) %*% InvSigma22.m %*% alpha.m
-                  alpha.cov.m <- Sigma11.m - diag(t(Sigma12.m) %*% InvSigma22.m %*% Sigma12.m)
+
+                  # In below for loop we are 
+                  # calculating diag_values = diag(t(Sigma12.m) %*% InvSigma22.m %*% Sigma12.m)
+                  # in a memory efficient fashion 
+                  diag_values <- numeric(ncol(Sigma12.m))
+                  for (i in 1:ncol(Sigma12.m)) {
+                      col_vector <- Sigma12.m[, i, drop = FALSE]
+  
+                      temp_product <- t(col_vector) %*% InvSigma22.m %*% col_vector
+  
+                      diag_values[i] <- temp_product
+                  }
+
+                  alpha.cov.m <- Sigma11.m - diag_values
                   alpha.m.post <- stats::rnorm(N.cell, alpha.mu.m, sqrt(alpha.cov.m))
                   alpha_space_pred[alpha_space_pred$spacetime.id == j, 
                                    paste0("Sample",m)] = alpha.m.post
@@ -196,22 +210,28 @@ grm_pred <- function(grm.fit,
                 Sigma12.m <- tau.m * cov_kern(distance = D12, 
                                              theta = theta.m)
 
-                if (is.null(grm.fit$discrete.theta.beta.info)) {
-                    Sigma22.m <- tau.m * cov_kern(distance = D22, 
-                                                 theta = theta.m)
-                    InvSigma22.m <- solve(Sigma22.m)
-                } else {
-                  which.theta.beta <- grm.fit$discrete.theta.beta.info$which.theta.beta.discrete[m]
-                  InvSigma22.m <- (1 / tau.m) * grm.fit$discrete.theta.beta.info$kernals.inv.beta[[which.theta.beta]]
-              }
+                Sigma22.m <- tau.m * cov_kern(distance = D22, 
+                                              theta = theta.m)
+                InvSigma22.m <- solve(Sigma22.m)
           
                 for (j in 1:N.spacetime) {
                     beta.m <- grm.fit$beta.space[grm.fit$beta.space$spacetime.id == j, 
                                         paste0("Sample", m)]
                     beta.mu.m <- t(Sigma12.m) %*% InvSigma22.m %*% beta.m
-                    beta.cov.m <- Sigma11.m - diag(t(Sigma12.m) %*% 
-                                                  InvSigma22.m %*% 
-                                                  Sigma12.m)
+
+                    # In below for loop we are 
+                    # calculating diag_values = diag(t(Sigma12.m) %*% InvSigma22.m %*% Sigma12.m)
+                    # in a memory efficient fasion 
+                    diag_values <- numeric(ncol(Sigma12.m))
+                    for (i in 1:ncol(Sigma12.m)) {
+                        col_vector <- Sigma12.m[, i, drop = FALSE]
+  
+                        temp_product <- t(col_vector) %*% InvSigma22.m %*% col_vector
+  
+                        diag_values[i] <- temp_product
+                    }
+
+                    beta.cov.m <- Sigma11.m - diag_values
                     beta.m.post <- stats::rnorm(N.cell, beta.mu.m, sqrt(beta.cov.m))
                     beta_space_pred[beta_space_pred$spacetime.id == j, 
                                     paste0("Sample", m)] = beta.m.post
