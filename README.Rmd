@@ -83,9 +83,6 @@ ctm_fit_cv <- grm_cv(Y = cmaq_aqs_matched$pm25,
 
 ?modis_aqs_matched
 
-cv_id_maia_ord <- create_cv(space.id = modis_aqs_matched$space_id,
-                            time.id = modis_aqs_matched$time_id,
-                            type = "ordinary")
 
 maia_fit <- grm(Y = modis_aqs_matched$pm25,
                 X = modis_aqs_matched$aod,
@@ -102,6 +99,10 @@ maia_fit <- grm(Y = modis_aqs_matched$pm25,
                 space.id = modis_aqs_matched$space_id,
                 time.id = modis_aqs_matched$time_id,
                 spacetime.id = modis_aqs_matched$spacetime_id)
+
+cv_id_maia_ord <- create_cv(space.id = modis_aqs_matched$space_id,
+                            time.id = modis_aqs_matched$time_id,
+                            type = "ordinary")
 
 maia_fit_cv <- grm_cv(Y = modis_aqs_matched$pm25,
                       X = modis_aqs_matched$aod,

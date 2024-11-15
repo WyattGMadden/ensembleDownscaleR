@@ -45,11 +45,14 @@ ensemble_spatial <- function(grm.fit.cv.1,
     grm.fit.cv.2$date <- date.Y.2
 
     # Remove NA's from the first and last time interval
+    # and due to insufficient obs within space_id
     grm.fit.cv.1 <- grm.fit.cv.1[!is.na(grm.fit.cv.1$estimate), ]
     grm.fit.cv.2 <- grm.fit.cv.2[!is.na(grm.fit.cv.2$estimate), ]
 
     # Use only first primary variable
     # results with second primary variable observed
+    # and only second primary variable results
+    # with first primary variable observed
     grm.fit.cv.1$link_id <- paste(grm.fit.cv.1$date, 
                                   grm.fit.cv.1$space_id, 
                                   sep = "_")
@@ -57,9 +60,10 @@ ensemble_spatial <- function(grm.fit.cv.1,
                                   grm.fit.cv.2$space_id, 
                                   sep = "_")
     grm.fit.cv.1 <- grm.fit.cv.1[grm.fit.cv.1$link_id %in% grm.fit.cv.2$link_id, ]
-
+    grm.fit.cv.2 <- grm.fit.cv.2[grm.fit.cv.2$link_id %in% grm.fit.cv.1$link_id, ] #new
     grm.fit.cv.2$estimate_1 <- grm.fit.cv.1$estimate[match(grm.fit.cv.1$link_id, 
                                                              grm.fit.cv.2$link_id)]
+
     grm.fit.cv.2$sd_1 <- grm.fit.cv.1$sd[match(grm.fit.cv.1$link_id,
                                                  grm.fit.cv.2$link_id)]
 
