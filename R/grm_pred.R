@@ -70,9 +70,13 @@ grm_pred <- function(grm.fit,
             #(can happen in cross validation with binary variables)
             L.pred <- apply(X = L.pred, 
                             MARGIN = 2, 
-                            FUN = function(x) ifelse(length(unique(x)) != 1,
-                                                    scale(x),
-                                                    x))
+                            FUN = function(x) {
+                                if (length(unique(x)) <= 1) {
+                                    x <- scale(x)
+                                }
+                                return(x)
+                            }
+                            )
         }
 
         if (!is.null(M.pred)) {
@@ -81,9 +85,13 @@ grm_pred <- function(grm.fit,
             #(can happen in cross validation with binary variables)
             M.pred <- apply(X = M.pred, 
                             MARGIN = 2, 
-                            FUN = function(x) ifelse(length(unique(x)) <= 1,
-                                                    scale(x),
-                                                    x))
+                            FUN = function(x) {
+                                if (length(unique(x)) <= 1) {
+                                    x <- scale(x)
+                                }
+                                return(x)
+                            }
+                            )
         }
 
 
