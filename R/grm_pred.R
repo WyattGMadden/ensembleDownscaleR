@@ -38,7 +38,7 @@ grm_pred <- function(grm.fit,
                     in.sample = FALSE) {
 
     # assertions
-    if (nrow(grm_fit$others) < n.iter) {
+    if (nrow(grm.fit$others) < n.iter) {
         stop("n.iter must be less than or equal to the number of iterations in the grm.fit object")
     }
 
