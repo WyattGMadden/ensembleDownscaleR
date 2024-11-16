@@ -37,13 +37,18 @@ grm_pred <- function(grm.fit,
                     verbose = TRUE,
                     in.sample = FALSE) {
 
+    # assertions
+    if (nrow(grm_fit$others) < n.iter) {
+        stop("n.iter must be less than or equal to the number of iterations in the grm.fit object")
+    }
+
     if (!in.sample) {
 
         ###Print some information
         cat("Preparing for Prediction\n")
   
         N <- length(X.pred) #Total AOD observations
-        N.space <- max(space.id) #Total number of prediction cells
+        N.space <- length(unique(space.id)) #Total number of prediction cells
         N.time <- max(time.id) #Maximum number of time interval (weeks) in prediction
         N.time.obs <- length(unique(time.id)) #Number of observed time interval (weeks)
         N.spacetime <- max(spacetime.id) #Time points where spatial trends vary by (year)
