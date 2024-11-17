@@ -54,6 +54,13 @@ grm_cv <- function(Y,
                   verbose = TRUE,
                   verbose.iter = 1000) {
 
+    # assertions
+
+    if (min(table(space.id)) < cv.object$num.folds) {
+
+        stop("Number of observations in each space.id must be greater than or equal to cv.object$num.folds")
+
+    }
     cv.id <- cv.object$cv.id
 
     Y.cv <- data.frame(time_id = time.id, 
