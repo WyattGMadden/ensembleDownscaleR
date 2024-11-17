@@ -49,6 +49,7 @@ ensemble_spatial <- function(grm.fit.cv.1,
     grm.fit.cv.1 <- grm.fit.cv.1[!is.na(grm.fit.cv.1$estimate), ]
     grm.fit.cv.2 <- grm.fit.cv.2[!is.na(grm.fit.cv.2$estimate), ]
 
+
     # Use only first primary variable
     # results with second primary variable observed
     # and only second primary variable results
