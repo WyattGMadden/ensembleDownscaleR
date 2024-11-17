@@ -48,14 +48,10 @@ weight_pred <- function(ensemble.fit,
     N.mon <- nrow(locations.Y)
     N.cell <- nrow(locations.pred)
   
-    XY <- rbind(locations.Y, 
-               locations.pred)
     D22 <- as.matrix(stats::dist(locations.Y, 
                                 diag = TRUE, 
                                 upper = TRUE))
-    D12 <- as.matrix(stats::dist(XY, 
-                                diag = TRUE, 
-                                upper = TRUE))[c(1:N.mon), -c(1:N.mon)]
+    D12 <- calculate_distances(locations.Y, locations.pred)
   
     q.pred <- matrix(NA, N.cell, n.iter)
   
