@@ -136,7 +136,6 @@ grm_pred <- function(grm.fit,
 
         
         ####Predict alpha and beta at grid cells
-        XY <- rbind(locations.Y, locations.pred)
         D22 <- as.matrix(stats::dist(locations.Y, diag = TRUE, upper = TRUE))
         D12 <- calculate_distances(locations.Y, locations.pred)
 

@@ -74,9 +74,18 @@ weight_pred <- function(ensemble.fit,
         InvSigma22.m <- solve(Sigma22.m)
     
         q.mu.m <- t(Sigma12.m) %*% InvSigma22.m %*% q.m
-        q.cov.m <- Sigma11.m - diag(t(Sigma12.m) 
-                                   %*% InvSigma22.m 
-                                   %*% Sigma12.m)
+        # In below for loop we are 
+        # calculating diag_values = diag(t(Sigma12.m) %*% InvSigma22.m %*% Sigma12.m)
+        # in a memory efficient fashion 
+        diag_values <- numeric(ncol(Sigma12.m))
+        for (i in 1:ncol(Sigma12.m)) {
+            col_vector <- Sigma12.m[, i, drop = FALSE]
+  
+            temp_product <- t(col_vector) %*% InvSigma22.m %*% col_vector
+
+            diag_values[i] <- temp_product
+        }
+        q.cov.m <- Sigma11.m - diag_values
         q.m.post <- stats::rnorm(N.cell, q.mu.m, sqrt(q.cov.m))
     
         q.pred[, m] <- q.m.post
