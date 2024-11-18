@@ -37,7 +37,6 @@ weight_pred <- function(ensemble.fit,
 
     locations.pred <- unique(cbind(coords.pred.1, space.id.pred.1))
     locations.pred <- locations.pred[order(locations.pred$space.id.pred.1), ]
-    locations.pred <- locations.pred[, c("x", "y")]
 
     n.iter <- length(theta)
   
@@ -51,7 +50,7 @@ weight_pred <- function(ensemble.fit,
     D22 <- as.matrix(stats::dist(locations.Y, 
                                 diag = TRUE, 
                                 upper = TRUE))
-    D12 <- calculate_distances(locations.Y, locations.pred)
+    D12 <- calculate_distances(locations.Y, locations.pred[, c("x", "y")])
   
     q.pred <- matrix(NA, N.cell, n.iter)
   
@@ -91,6 +90,7 @@ weight_pred <- function(ensemble.fit,
         q.pred[, m] <- q.m.post
     }
   
-    return(q.pred)
+    return(list(weights = q.pred,
+                locations = locations.pred))
 }
   

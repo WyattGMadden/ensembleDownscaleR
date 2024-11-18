@@ -65,6 +65,7 @@ grm_cv <- function(Y,
 
     Y.cv <- data.frame(time_id = time.id, 
                       space_id = space.id, 
+                      spacetime_id = spacetime.id,
                       obs = Y, 
                       estimate = NA, 
                       sd = NA)

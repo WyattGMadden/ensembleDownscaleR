@@ -46,6 +46,7 @@ gap_fill <- function(grm.pred.1,
 
 
   
+    weights <- weights$weights
     W <- 1 / (exp(-weights) + 1)
     W.mean <-  apply(W, 1, mean)
     W.sd <-  apply(1 / (exp(-weights) + 1), 1, stats::sd)
