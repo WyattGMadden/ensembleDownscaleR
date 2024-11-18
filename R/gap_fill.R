@@ -68,5 +68,8 @@ gap_fill <- function(grm.pred.1,
     SD.ensemb[which.use] <- Est.SD
       
     list(ensemble.estimate = Est.ensemb,
-         ensemble.sd = SD.ensemb)
+         ensemble.sd = SD.ensemb,
+         time.id = Y.pred.1$time.id,
+         space.id = Y.pred.1$space.id,
+         spacetime.id = Y.pred.1$spacetime.id)
 }
