@@ -67,10 +67,9 @@ grm_pred <- function(grm.fit,
         ############################
         ###standardize X, L and M###
         ############################
-        X.pred <- scale(X.pred)
+        X.pred <- scale(X.pred)[, 1]
 
         if (!is.null(L.pred)) {
-            L.temp <- covariate_matrix_standardize(L.pred)$x
             L.pred <- as.matrix(L.pred)
             # scale unless variable is all one value 
             #(can happen in cross validation with binary variables)
@@ -307,12 +306,12 @@ grm_pred <- function(grm.fit,
 
     id.temp <- paste0(space.id, "_", spacetime.id)
     
-        if (!is.null(grm.fit$delta)) {
-            delta <- as.matrix(grm.fit$delta)
-        }
-        if (!is.null(grm.fit$gamma)) {
-            gamma <- as.matrix(grm.fit$gamma)
-        }
+    if (!is.null(grm.fit$delta)) {
+        delta <- as.matrix(grm.fit$delta)
+    }
+    if (!is.null(grm.fit$gamma)) {
+        gamma <- as.matrix(grm.fit$gamma)
+    }
 
     
     

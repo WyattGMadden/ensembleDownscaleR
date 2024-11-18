@@ -41,10 +41,10 @@ library(ensembleDownscaleR)
 
 ctm_fit <- grm(Y = cmaq_aqs_matched$pm25,
                X = cmaq_aqs_matched$ctm,
-#               L = cmaq_aqs_matched[, c("elevation", "forestcover",
-#                                        "hwy_length", "lim_hwy_length", 
-#                                        "local_rd_length", "point_emi_any")],
-#               M = cmaq_aqs_matched[, c("tmp", "wind")],
+               L = cmaq_aqs_matched[, c("elevation", "forestcover",
+                                        "hwy_length", "lim_hwy_length", 
+                                        "local_rd_length", "point_emi_any")],
+               M = cmaq_aqs_matched[, c("tmp", "wind")],
                n.iter = 1000,
                burn = 100,
                thin = 4,
@@ -132,10 +132,10 @@ maia_fit_cv <- grm_cv(Y = modis_aqs_matched$pm25,
 
 ctm_pred <- grm_pred(grm.fit = ctm_fit,
                      X.pred = cmaq_full$ctm,
-#                     L.pred = cmaq_full[, c("elevation", "forestcover",
-#                                            "hwy_length", "lim_hwy_length", 
-#                                            "local_rd_length", "point_emi_any")],
-#                     M.pred = cmaq_full[, c("tmp", "wind")],
+                     L.pred = cmaq_full[, c("elevation", "forestcover",
+                                            "hwy_length", "lim_hwy_length", 
+                                            "local_rd_length", "point_emi_any")],
+                     M.pred = cmaq_full[, c("tmp", "wind")],
                      coords.Y = cmaq_aqs_matched[, c("x", "y")],
                      space.id.Y = cmaq_aqs_matched$space_id,
                      coords.pred = cmaq_full[, c("x", "y")],
@@ -204,6 +204,71 @@ weight_preds <- weight_pred(ensemble.fit = ensemble_fit,
                             coords.pred.1 = cmaq_full[, c("x", "y")],
                             space.id.pred.1 = cmaq_full$space_id)
 
+full <- cmaq_full
+
+full$weight <- apply(1 / (exp(-weight_preds$weight) + 1), 1, mean)
+
+
+library(tidyverse)
+full |>
+    filter(time_id == 77) |>
+    ggplot(aes(x = x, y = y, color = weight)) +
+    geom_tile(size = 4) +
+    geom_point(data = cmaq_aqs_matched |>
+                   filter(time_id == 76),
+               aes(x = x, y = y), 
+               color = "black",
+               size = 3)
+    
+
+cmaq_full |>
+    filter(time_id == 77) |>
+    ggplot(aes(x = x, y = y, color = ctm)) +
+    geom_tile(size = 4) +
+    geom_point(data = cmaq_aqs_matched |>
+                   filter(time_id == 77),
+               aes(x = x, y = y), 
+               color = "black",
+               size = 3)
+
+unique(modis_full$time_id)
+modis_full |>
+    filter(time_id == 75) |>
+    ggplot(aes(x = x, y = y, color = aod)) +
+    geom_tile(size = 4) +
+    geom_point(data = cmaq_aqs_matched |>
+                   filter(time_id == 77),
+               aes(x = x, y = y), 
+               color = "black",
+               size = 3)
+
+ctm_pred$x <- cmaq_full$x
+ctm_pred$y <- cmaq_full$y
+ctm_pred$estimate <- ctm_pred$estimate[, 1]
+
+ctm_pred |>
+    filter(time.id == 77) |>
+    ggplot(aes(x = x, y = y, color = estimate)) +
+    geom_tile(size = 4) +
+    geom_point(data = cmaq_aqs_matched |>
+                   filter(time_id == 76),
+               aes(x = x, y = y), 
+               color = "black",
+               size = 3)
+
+maia_pred$x <- modis_full$x
+maia_pred$y <- modis_full$y
+maia_pred$estimate <- maia_pred$estimate[, 1]
+
+maia_pred |>
+    filter(time.id == 77) |>
+    ggplot(aes(x = x, y = y, color = estimate)) +
+    geom_tile(size = 4) +
+    geom_point(data = modis_aqs_matched |>
+                   filter(time_id == 77),
+               aes(x = x, y = y), 
+               color = "black",
+               size = 3)
 
 results <- gap_fill(grm.pred.1 = ctm_pred,
                     grm.pred.2 = maia_pred,
@@ -211,6 +276,18 @@ results <- gap_fill(grm.pred.1 = ctm_pred,
                     date.pred.2 = modis_full$date, 
                     space.id = ctm_pred$space.id, 
                     weights = weight_preds)
+
+temp <- data.frame(est = results$ensemble.estimate[, 1],
+           time_id = results$time.id,
+           space_id = results$space.id,
+           spacetime_id = results$spacetime.id,
+           x = cmaq_full$x,
+           y = cmaq_full$y)
+
+temp |>
+    filter(time_id == 76) |>
+    ggplot(aes(x = x, y = y, color = est)) +
+    geom_tile(size = 4)
 
 ```
 

@@ -89,8 +89,10 @@ weight_pred <- function(ensemble.fit,
     
         q.pred[, m] <- q.m.post
     }
+    # clean
+    locations.pred$space.id <- locations.pred$space.id.pred.1
+    locations <- locations.pred[, c("x", "y", "space.id")]
   
     return(list(weights = q.pred,
                 locations = locations.pred))
-}
   
