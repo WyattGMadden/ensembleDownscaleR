@@ -70,13 +70,14 @@ grm_pred <- function(grm.fit,
         X.pred <- scale(X.pred)
 
         if (!is.null(L.pred)) {
+            L.temp <- covariate_matrix_standardize(L.pred)$x
             L.pred <- as.matrix(L.pred)
             # scale unless variable is all one value 
             #(can happen in cross validation with binary variables)
             L.pred <- apply(X = L.pred, 
                             MARGIN = 2, 
                             FUN = function(x) {
-                                if (length(unique(x)) <= 1) {
+                                if (length(unique(x)) > 1) {
                                     x <- scale(x)
                                 }
                                 return(x)
@@ -91,7 +92,7 @@ grm_pred <- function(grm.fit,
             M.pred <- apply(X = M.pred, 
                             MARGIN = 2, 
                             FUN = function(x) {
-                                if (length(unique(x)) <= 1) {
+                                if (length(unique(x)) > 1) {
                                     x <- scale(x)
                                 }
                                 return(x)
