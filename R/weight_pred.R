@@ -95,4 +95,4 @@ weight_pred <- function(ensemble.fit,
   
     return(list(weights = q.pred,
                 locations = locations.pred))
-  
+}
