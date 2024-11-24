@@ -6,10 +6,6 @@
 #
 #' @param grm.fit.cv.1 Output from grm_cv function for first primary variable
 #' @param grm.fit.cv.2 Output from grm_cv function for second primary variable
-#' @param date.Y.1 Date (or other unique day id) for first primary variable
-#' @param date.Y.2 Date (or other unique day id) for second primary variable
-#' @param coords.Y.1 Matrix of x y coordinates for first primary variable, with colnames(coords) == c("x", "y"), (n, 2)
-#' @param space.id.Y.1 Spatial location ID vector for first primary variable (n)
 #' @param tau.a First tau prior hyperparameter
 #' @param tau.b Second tau prior hyperparameter
 #' @param theta.tune Theta Metropolis-Hastings proposal tuning parameter
@@ -26,50 +22,46 @@
 
 
 ensemble_spatial <- function(grm.fit.cv.1,
-                            grm.fit.cv.2,
-                            date.Y.1,
-                            date.Y.2,
-                            coords.Y.1,
-                            space.id.Y.1,
-                            n.iter = 25000, 
-                            burn = 5000, 
-                            thin = 4,
-                            tau.a = 0.001, 
-                            tau.b = 0.001, 
-                            theta.tune = 0.2, 
-                            theta.a = 5, 
-                            theta.b = 0.05) {
+                             grm.fit.cv.2,
+                             n.iter = 25000, 
+                             burn = 5000, 
+                             thin = 4,
+                             tau.a = 0.001, 
+                             tau.b = 0.001, 
+                             theta.tune = 0.2, 
+                             theta.a = 5, 
+                             theta.b = 0.05) {
   
 
-    grm.fit.cv.1$date <- date.Y.1
-    grm.fit.cv.2$date <- date.Y.2
+    space.id.Y.1 <- grm.fit.cv.1$space.id
+    coords.Y.1 <- grm.fit.cv.1[, c("x", "y")]
+
 
     # Remove NA's from the first and last time interval
-    # and due to insufficient obs within space_id
+    # and due to insufficient obs within space.id
     grm.fit.cv.1 <- grm.fit.cv.1[!is.na(grm.fit.cv.1$estimate), ]
     grm.fit.cv.2 <- grm.fit.cv.2[!is.na(grm.fit.cv.2$estimate), ]
+
 
 
     # Use only first primary variable
     # results with second primary variable observed
     # and only second primary variable results
     # with first primary variable observed
-    grm.fit.cv.1$link_id <- paste(grm.fit.cv.1$date, 
-                                  grm.fit.cv.1$space_id, 
+    grm.fit.cv.1$link_id <- paste(grm.fit.cv.1$time.id, 
+                                  grm.fit.cv.1$space.id, 
                                   sep = "_")
-    grm.fit.cv.2$link_id <- paste(grm.fit.cv.2$date, 
-                                  grm.fit.cv.2$space_id, 
+    grm.fit.cv.2$link_id <- paste(grm.fit.cv.2$time.id, 
+                                  grm.fit.cv.2$space.id, 
                                   sep = "_")
     grm.fit.cv.1 <- grm.fit.cv.1[grm.fit.cv.1$link_id %in% grm.fit.cv.2$link_id, ]
     grm.fit.cv.2 <- grm.fit.cv.2[grm.fit.cv.2$link_id %in% grm.fit.cv.1$link_id, ] #new
-    grm.fit.cv.2$estimate_1 <- grm.fit.cv.1$estimate[match(grm.fit.cv.1$link_id, 
-                                                             grm.fit.cv.2$link_id)]
+    grm.fit.cv.2$estimate_1 <- grm.fit.cv.1$estimate[match(grm.fit.cv.2$link_id, 
+                                                             grm.fit.cv.1$link_id)]
 
-    grm.fit.cv.2$sd_1 <- grm.fit.cv.1$sd[match(grm.fit.cv.1$link_id,
-                                                 grm.fit.cv.2$link_id)]
+    grm.fit.cv.2$sd_1 <- grm.fit.cv.1$sd[match(grm.fit.cv.2$link_id,
+                                                 grm.fit.cv.1$link_id)]
 
-    grm.fit.cv.2 <- grm.fit.cv.2[order(grm.fit.cv.2$space_id, 
-                                       grm.fit.cv.2$date), ]
 
     # Calculate densities
     d1 <- stats::dnorm(grm.fit.cv.2$obs, 
@@ -79,13 +71,13 @@ ensemble_spatial <- function(grm.fit.cv.1,
                        grm.fit.cv.2$estimate, 
                        grm.fit.cv.2$sd)
 
-    S <- max(grm.fit.cv.2$space_id)
+    S <- max(grm.fit.cv.2$space.id)
     n <- length(d1)
 
     ###Create distance matrix
-    dist.space.mat <- unique(cbind(space.id.Y.1, coords.Y.1))
-    dist.space.mat <- dist.space.mat[order(dist.space.mat$space.id.Y.1), ]
-    dist.space.mat <- as.matrix(stats::dist(dist.space.mat[, c("x", "y")], 
+    locs <- unique(cbind(space.id.Y.1, coords.Y.1))
+    locs <- locs[order(locs$space.id.Y.1), ]
+    dist.space.mat <- as.matrix(stats::dist(locs[, c("x", "y")], 
                                             diag = TRUE, 
                                             upper = TRUE))
   
@@ -114,12 +106,12 @@ ensemble_spatial <- function(grm.fit.cv.1,
         }
  
         ##Update log-odds q
-        m <- q[grm.fit.cv.2$space_id]
+        m <- q[grm.fit.cv.2$space.id]
         omega <- BayesLogit::rpg.devroye(n, 1, m)
     
-        O <- diag(tapply(omega, grm.fit.cv.2$space_id, sum))
+        O <- diag(tapply(omega, grm.fit.cv.2$space.id, sum))
         VVV <- solve(O + solve(Sigma))
-        MMM <- VVV %*% (tapply(z - 0.5, grm.fit.cv.2$space_id, sum))  
+        MMM <- VVV %*% (tapply(z - 0.5, grm.fit.cv.2$space.id, sum))  
         q <- MASS::mvrnorm(1, MMM, VVV)
     
         #update tau
@@ -148,11 +140,11 @@ ensemble_spatial <- function(grm.fit.cv.1,
         }
     
         ##Update indicator z
-        w <- 1 / (1 + exp(-q))[grm.fit.cv.2$space_id]
+        w <- 1 / (1 + exp(-q))[grm.fit.cv.2$space.id]
         p <- w * d1 / (w * d1 + (1 - w) * d2)
         z <- stats::rbinom(n, 1, p)
     
-        if (i > burn & i %% thin == 0) {
+        if (i > burn & ((i - burn) %% thin)  == 0) {
             k <- (i - burn) / thin
             q.save[k, ] <- q
             tau2.save[k] <- tau2
@@ -170,7 +162,8 @@ ensemble_spatial <- function(grm.fit.cv.1,
   
     list(q = q.save, 
          other = other.save, 
-         theta.acc = theta.acc / n.iter)
+         theta.acc = theta.acc / n.iter,
+         locations = locs)
 
 }
 

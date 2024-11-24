@@ -7,10 +7,6 @@
 ensemble_spatial(
   grm.fit.cv.1,
   grm.fit.cv.2,
-  date.Y.1,
-  date.Y.2,
-  coords.Y.1,
-  space.id.Y.1,
   n.iter = 25000,
   burn = 5000,
   thin = 4,
@@ -25,14 +21,6 @@ ensemble_spatial(
 \item{grm.fit.cv.1}{Output from grm_cv function for first primary variable}
 
 \item{grm.fit.cv.2}{Output from grm_cv function for second primary variable}
-
-\item{date.Y.1}{Date (or other unique day id) for first primary variable}
-
-\item{date.Y.2}{Date (or other unique day id) for second primary variable}
-
-\item{coords.Y.1}{Matrix of x y coordinates for first primary variable, with colnames(coords) == c("x", "y"), (n, 2)}
-
-\item{space.id.Y.1}{Spatial location ID vector for first primary variable (n)}
 
 \item{n.iter}{Number of iterations used in predictions.}
 

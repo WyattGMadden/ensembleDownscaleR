@@ -50,15 +50,15 @@ grm_cv(
 \arguments{
 \item{Y}{Dependent variable vector (n)}
 
-\item{X}{Unstandardized primary independent variable vector (n)}
+\item{X}{Standardized primary independent variable vector for all predictions (n_pred)}
 
 \item{cv.object}{A named list containing cv.id, num.folds, and type. Can be created with create_cv function.}
 
-\item{L}{Unstandardized spatial covariate matrix (n, p1)}
+\item{L}{Standardized spatial covariate matrix for all predictions (n_pred, p1)}
 
-\item{M}{Unstandardized spatio-temporal covariate matrix (n, p2)}
+\item{M}{Standardized spatio-temporal covariate matrix for all predictions (n_pred, p2)}
 
-\item{coords}{Matrix of x y coordinates, with colnames(coords) == c("x", "y"), (n, 2)}
+\item{coords}{Matrix of prediction x, y coodinates (n_pred, 2)}
 
 \item{space.id}{Spatial location ID vector (n)}
 

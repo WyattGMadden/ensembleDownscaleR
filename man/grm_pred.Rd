@@ -6,12 +6,10 @@
 \usage{
 grm_pred(
   grm.fit,
-  X.pred,
-  L.pred = NULL,
-  M.pred = NULL,
-  coords.Y,
-  space.id.Y,
-  coords.pred,
+  X,
+  L = NULL,
+  M = NULL,
+  coords,
   space.id,
   time.id,
   spacetime.id,
@@ -25,17 +23,13 @@ grm_pred(
 \arguments{
 \item{grm.fit}{Fit object created with grm()}
 
-\item{X.pred}{Standardized primary independent variable vector for all predictions (n_pred)}
+\item{X}{Standardized primary independent variable vector for all predictions (n_pred)}
 
-\item{L.pred}{Standardized spatial covariate matrix for all predictions (n_pred, p1)}
+\item{L}{Standardized spatial covariate matrix for all predictions (n_pred, p1)}
 
-\item{M.pred}{Standardized spatio-temporal covariate matrix for all predictions (n_pred, p2)}
+\item{M}{Standardized spatio-temporal covariate matrix for all predictions (n_pred, p2)}
 
-\item{coords.Y}{Matrix of primary independent variable x, y coodinates (n_obs, 2)}
-
-\item{space.id.Y}{Vector of space id numbers for primary variables, corresponding with coords.Y (n_obs)}
-
-\item{coords.pred}{Matrix of prediction x, y coodinates (n_pred, 2)}
+\item{coords}{Matrix of prediction x, y coodinates (n_pred, 2)}
 
 \item{space.id}{Spatial location ID vector (n)}
 

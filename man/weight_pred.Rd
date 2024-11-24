@@ -4,25 +4,14 @@
 \alias{weight_pred}
 \title{Generate weights from ensemble spatial fit}
 \usage{
-weight_pred(
-  ensemble.fit,
-  coords.Y.1,
-  space.id.Y.1,
-  coords.pred.1,
-  space.id.pred.1,
-  verbose = TRUE
-)
+weight_pred(ensemble.fit, coords, space.id, verbose = TRUE)
 }
 \arguments{
 \item{ensemble.fit}{Fit from ensemble_spatial() function}
 
-\item{coords.Y.1}{Coordinate matrix for first primary variable}
+\item{coords}{Coordinate matrix for first variable predictions}
 
-\item{space.id.Y.1}{Space id for first primary variable}
-
-\item{coords.pred.1}{Coordinate matrix for first variable predictions}
-
-\item{space.id.pred.1}{Space id for first primary variable predictions}
+\item{space.id}{Space id for first primary variable predictions}
 
 \item{verbose}{Print MCMC output}
 }

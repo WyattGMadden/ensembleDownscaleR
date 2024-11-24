@@ -14,45 +14,45 @@
 #' 
 #' @export
 grm_cv <- function(Y, 
-                  X, 
-                  cv.object,
-                  L = NULL, 
-                  M = NULL, 
-                  coords,
-                  space.id, 
-                  time.id, 
-                  spacetime.id,
-                  include.additive.weekly.resid = T,
-                  include.additive.annual.resid = T,
-                  include.multiplicative.weekly.resid = T,
-                  include.multiplicative.annual.resid = T,
-                  num_neighbors = 10,
-                  n.iter = 25000,
-                  burn = 5000,
-                  thin = 4,
-                  covariance = "exponential",
-                  covariance.kernal = NULL,
-                  matern.nu = 1.5,
-                  tau.alpha.a = 0.5,
-                  tau.alpha.b = 0.005,
-                  tau.beta.a = 0.5,
-                  tau.beta.b = 0.005,
-                  omega.a = 0.5,
-                  omega.b = 0.005,
-                  theta.alpha.tune = 0.2, 
-                  theta.alpha.a = 5, 
-                  theta.alpha.b = 0.05,
-                  theta.alpha.init = 100,
-                  theta.beta.tune = 0.2, 
-                  theta.beta.a = 5, 
-                  theta.beta.b = 0.05,
-                  theta.beta.init = 100,
-                  rho.alpha.init = 0.9999,
-                  rho.beta.init = 0.9999,
-                  sigma.a = 0.001, 
-                  sigma.b = 0.001,
-                  verbose = TRUE,
-                  verbose.iter = 1000) {
+                   X, 
+                   cv.object,
+                   L = NULL, 
+                   M = NULL, 
+                   coords,
+                   space.id, 
+                   time.id, 
+                   spacetime.id,
+                   include.additive.weekly.resid = T,
+                   include.additive.annual.resid = T,
+                   include.multiplicative.weekly.resid = T,
+                   include.multiplicative.annual.resid = T,
+                   num_neighbors = 10,
+                   n.iter = 25000,
+                   burn = 5000,
+                   thin = 4,
+                   covariance = "exponential",
+                   covariance.kernal = NULL,
+                   matern.nu = 1.5,
+                   tau.alpha.a = 0.5,
+                   tau.alpha.b = 0.005,
+                   tau.beta.a = 0.5,
+                   tau.beta.b = 0.005,
+                   omega.a = 0.5,
+                   omega.b = 0.005,
+                   theta.alpha.tune = 0.2, 
+                   theta.alpha.a = 5, 
+                   theta.alpha.b = 0.05,
+                   theta.alpha.init = 100,
+                   theta.beta.tune = 0.2, 
+                   theta.beta.a = 5, 
+                   theta.beta.b = 0.05,
+                   theta.beta.init = 100,
+                   rho.alpha.init = 0.9999,
+                   rho.beta.init = 0.9999,
+                   sigma.a = 0.001, 
+                   sigma.b = 0.001,
+                   verbose = TRUE,
+                   verbose.iter = 1000) {
 
     # assertions
 
@@ -63,12 +63,14 @@ grm_cv <- function(Y,
     }
     cv.id <- cv.object$cv.id
 
-    Y.cv <- data.frame(time_id = time.id, 
-                      space_id = space.id, 
-                      spacetime_id = spacetime.id,
-                      obs = Y, 
-                      estimate = NA, 
-                      sd = NA)
+    Y.cv <- data.frame(time.id = time.id, 
+                       space.id = space.id, 
+                       spacetime.id = spacetime.id,
+                       obs = Y, 
+                       estimate = NA, 
+                       sd = NA,
+                       x = coords[, c("x")],
+                       y = coords[, c("y")])
   
   
     for (cv.i in 1:cv.object$num.folds) {
@@ -190,12 +192,10 @@ grm_cv <- function(Y,
 
         cv.results <- grm_pred(grm.fit = fit.cv, 
                               n.iter = (n.iter - burn) / thin,
-                              X.pred = X.test, 
-                              L.pred = L.test, 
-                              M.pred = M.test, 
-                              coords.Y = coords.train,
-                              coords.pred = coords.test,
-                              space.id.Y = space.id.train.temp,
+                              X = X.test, 
+                              L = L.test, 
+                              M = M.test, 
+                              coords = coords.test,
                               space.id = space.id.test.temp,
                               time.id = time.id.test,
                               spacetime.id = spacetime.id.test,
@@ -208,8 +208,8 @@ grm_cv <- function(Y,
 
     }
  
-    Y.cv$upper_95 <- Y.cv$estimate + 1.96 * Y.cv$sd
-    Y.cv$lower_95 <- Y.cv$estimate - 1.96 * Y.cv$sd
+    Y.cv$upper.95 <- Y.cv$estimate + 1.96 * Y.cv$sd
+    Y.cv$lower95 <- Y.cv$estimate - 1.96 * Y.cv$sd
   
     return(Y.cv)
 }

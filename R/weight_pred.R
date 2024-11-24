@@ -6,10 +6,8 @@
 #' @inheritParams grm
 #'
 #' @param ensemble.fit Fit from ensemble_spatial() function
-#' @param coords.Y.1 Coordinate matrix for first primary variable
-#' @param space.id.Y.1 Space id for first primary variable 
-#' @param coords.pred.1 Coordinate matrix for first variable predictions
-#' @param space.id.pred.1 Space id for first primary variable predictions
+#' @param coords Coordinate matrix for first variable predictions
+#' @param space.id Space id for first primary variable predictions
 #'
 #' @return A matrix containing weights
 #'
@@ -20,10 +18,8 @@
 #' @export
 
 weight_pred <- function(ensemble.fit, 
-                       coords.Y.1,
-                       space.id.Y.1,
-                       coords.pred.1,
-                       space.id.pred.1,
+                       coords,
+                       space.id,
                        verbose = TRUE) {
 
     q <- ensemble.fit$q
@@ -31,12 +27,10 @@ weight_pred <- function(ensemble.fit,
     tau2 <- ensemble.fit$other$tau2
 
     #Create unique location matrices
-    locations.Y <- unique(cbind(coords.Y.1, space.id.Y.1))
-    locations.Y <- locations.Y[order(locations.Y$space.id.Y), ]
-    locations.Y <- locations.Y[, c("x", "y")]
+    locations.Y <- ensemble.fit$locations[, c("x", "y")]
 
-    locations.pred <- unique(cbind(coords.pred.1, space.id.pred.1))
-    locations.pred <- locations.pred[order(locations.pred$space.id.pred.1), ]
+    locations.pred <- unique(cbind(coords, space.id))
+    locations.pred <- locations.pred[order(locations.pred$space.id), ]
 
     n.iter <- length(theta)
   
@@ -90,7 +84,6 @@ weight_pred <- function(ensemble.fit,
         q.pred[, m] <- q.m.post
     }
     # clean
-    locations.pred$space.id <- locations.pred$space.id.pred.1
     locations <- locations.pred[, c("x", "y", "space.id")]
   
     return(list(weights = q.pred,

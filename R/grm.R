@@ -175,9 +175,9 @@ grm <- function(Y,
     ### Create Spatial Distance Matrix ###
     ######################################
 
-    dist.space.mat <- unique(cbind(space.id, coords))
-    dist.space.mat <- dist.space.mat[order(dist.space.mat$space.id), ]
-    dist.space.mat <- as.matrix(stats::dist(dist.space.mat[, c("x", "y")], 
+    locs <- unique(cbind(space.id, coords))
+    locs <- locs[order(locs$space.id), ]
+    dist.space.mat <- as.matrix(stats::dist(locs[, c("x", "y")], 
                                             diag = TRUE, 
                                             upper = TRUE))
 
@@ -817,7 +817,8 @@ grm <- function(Y,
          standardize.param = standardize.param,
          theta.acc = theta.acc,
          tau.acc = tau.acc,
-         cov_kern = cov_kern)
+         cov_kern = cov_kern,
+         locations = locs)
 }
 
 

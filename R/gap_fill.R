@@ -5,8 +5,6 @@
 #' @inheritParams grm
 #' @param grm.pred.1 Output from grm_pred() function for first primary variable
 #' @param grm.pred.2 Output from grm_pred() function for second primary variable
-#' @param date.pred.1 Date (or other unique day identifier) from first variable prediction dataset
-#' @param date.pred.2 Date (or other unique day identifier) from second variable prediction dataset
 #' @param weights Ensemble weights output from weight_pred 
 #'
 #' @return A list including ensemble predictions and standard deviations
@@ -18,21 +16,16 @@
 #' @export
 
 gap_fill <- function(grm.pred.1,
-                    grm.pred.2,
-                    date.pred.1,
-                    date.pred.2,
-                    space.id, 
-                    weights) {
+                     grm.pred.2,
+                     weights) {
 
 
-    grm.pred.1$date <- date.pred.1
-    grm.pred.2$date <- date.pred.2
-
+    space.id <- grm.pred.1$space.id
     #Merge second variable predictions onto first variable predictions
-    grm.pred.1$link_id <- paste(grm.pred.1$date, 
+    grm.pred.1$link_id <- paste(grm.pred.1$time.id, 
                                 grm.pred.1$space.id, 
                                 sep = "_")
-    grm.pred.2$link_id <- paste(grm.pred.2$date, 
+    grm.pred.2$link_id <- paste(grm.pred.2$time.id, 
                                 grm.pred.2$space.id, 
                                 sep = "_")
 
