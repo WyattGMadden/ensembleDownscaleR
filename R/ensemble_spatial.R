@@ -33,7 +33,7 @@ ensemble_spatial <- function(grm.fit.cv.1,
                              theta.b = 0.05) {
   
 
-    space.id.Y.1 <- grm.fit.cv.1$space.id
+    space.id <- grm.fit.cv.1$space.id
     coords.Y.1 <- grm.fit.cv.1[, c("x", "y")]
 
 
@@ -75,8 +75,8 @@ ensemble_spatial <- function(grm.fit.cv.1,
     n <- length(d1)
 
     ###Create distance matrix
-    locs <- unique(cbind(space.id.Y.1, coords.Y.1))
-    locs <- locs[order(locs$space.id.Y.1), ]
+    locs <- unique(cbind(space.id, coords.Y.1))
+    locs <- locs[order(locs$space.id), ]
     dist.space.mat <- as.matrix(stats::dist(locs[, c("x", "y")], 
                                             diag = TRUE, 
                                             upper = TRUE))
