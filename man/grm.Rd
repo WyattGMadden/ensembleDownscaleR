@@ -13,10 +13,10 @@ grm(
   space.id,
   time.id,
   spacetime.id,
-  include.additive.weekly.resid = T,
-  include.additive.annual.resid = T,
-  include.multiplicative.weekly.resid = T,
-  include.multiplicative.annual.resid = T,
+  include.additive.temporal.effect = T,
+  include.additive.spatial.effect = T,
+  include.multiplicative.temporal.effect = T,
+  include.multiplicative.spatial.effect = T,
   num_neighbors = 10,
   n.iter = 25000,
   burn = 5000,
@@ -63,13 +63,13 @@ grm(
 
 \item{spacetime.id}{ID vector of time points where spatial trends vary (n)}
 
-\item{include.additive.weekly.resid}{Include additive temporal (weekly) residual bias not explained by other inputes}
+\item{include.additive.temporal.effect}{Include additive temporal random effects.}
 
-\item{include.additive.annual.resid}{Include additive spatial (annual) residual bias not explained by other inputes}
+\item{include.additive.spatial.effect}{Include additive spatial random effects.}
 
-\item{include.multiplicative.weekly.resid}{Include multiplicative temporal (weekly) residual bias not explained by other inputes}
+\item{include.multiplicative.temporal.effect}{Include multiplicative temporal random effects.}
 
-\item{include.multiplicative.annual.resid}{Include multiplicative spatial (weekly) residual bias not explained by other inputes}
+\item{include.multiplicative.spatial.effect}{Include multiplicative spatial random effects.}
 
 \item{num_neighbors}{Number of nearest neighbors to use in NNGP}
 

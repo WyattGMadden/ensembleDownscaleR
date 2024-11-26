@@ -11,10 +11,10 @@
 #' @param space.id Spatial location ID vector (n)
 #' @param time.id Temporal location ID vector (n)
 #' @param spacetime.id ID vector of time points where spatial trends vary (n)
-#' @param include.additive.weekly.resid Include additive temporal (weekly) residual bias not explained by other inputes
-#' @param include.additive.annual.resid Include additive spatial (annual) residual bias not explained by other inputes
-#' @param include.multiplicative.weekly.resid Include multiplicative temporal (weekly) residual bias not explained by other inputes
-#' @param include.multiplicative.annual.resid Include multiplicative spatial (weekly) residual bias not explained by other inputes
+#' @param include.additive.temporal.effect Include additive temporal random effects.
+#' @param include.additive.spatial.effect Include additive spatial random effects.
+#' @param include.multiplicative.temporal.effect Include multiplicative temporal random effects.
+#' @param include.multiplicative.spatial.effect Include multiplicative spatial random effects.
 #' @param num_neighbors Number of nearest neighbors to use in NNGP
 #' @param n.iter Number of iterations used in predictions. 
 #' @param burn Number of pre-covergence simulations
@@ -58,10 +58,10 @@ grm <- function(Y,
                space.id, 
                time.id, 
                spacetime.id,
-               include.additive.weekly.resid = T,
-               include.additive.annual.resid = T,
-               include.multiplicative.weekly.resid = T,
-               include.multiplicative.annual.resid = T,
+               include.additive.temporal.effect = T,
+               include.additive.spatial.effect = T,
+               include.multiplicative.temporal.effect = T,
+               include.multiplicative.spatial.effect = T,
                num_neighbors = 10,
                n.iter = 25000,
                burn = 5000,
@@ -97,8 +97,8 @@ grm <- function(Y,
   
     N = length(Y) #Total AOD-PM linked pairs
     N.space <- max(space.id) #Total number of monitors in training
-    N.time <- max(time.id) #Maximum number of time interval (weeks) in training
-    N.time.obs <- length(unique(time.id)) #Number of observed time interval (weeks)
+    N.time <- max(time.id) #Maximum number of time interval in training
+    N.time.obs <- length(unique(time.id)) #Number of observed time interval
     N.spacetime <- max(spacetime.id) #Time points where spatial trends vary by (year)
     
     N.Lmax <- ncol(L) #Number of spatial predictors to use
@@ -325,7 +325,7 @@ grm <- function(Y,
     ###Initialize alpha_time and its CAR variance omega_alpha
     alpha_time <- rep(0, N.time)
     omega_alpha <- 0
-    if (include.additive.weekly.resid) { 
+    if (include.additive.temporal.effect) { 
         alpha_time <- (1 / GtG_time) * t(Gamma_time) %*% (Y - mu)
         omega_alpha <- as.numeric(stats::var(alpha_time, na.rm = T))
     }
@@ -333,7 +333,7 @@ grm <- function(Y,
     ###Initialize beta_time and its CAR variance omega_beta
     beta_time <- rep(0, N.time)
     omega_beta <- 0
-    if (include.multiplicative.weekly.resid) { 
+    if (include.multiplicative.temporal.effect) { 
         RRR <- Y - mu - alpha_time[time.id]
         beta_time <-  1 / X_W * t(Gamma_time) %*% (X * RRR)
         omega_beta <- as.numeric(stats::var(beta_time, na.rm = T))
@@ -342,7 +342,7 @@ grm <- function(Y,
     ###Initialize alpha_spacetime and its spatial variance tau_alpha
     alpha_space <- rep(0, N.spacetime * N.space)
     tau_alpha <- 0
-    if (include.additive.annual.resid) {
+    if (include.additive.spatial.effect) {
         RRR <- Y - mu - alpha_time[time.id] - beta_time[time.id] * X
         alpha_space <- as.numeric((1 / GtG_space) * t(Gamma_space) %*% RRR)
         tau_alpha <- as.numeric(stats::var(alpha_space, na.rm = T))
@@ -351,7 +351,7 @@ grm <- function(Y,
     ###Initialize beta_spacetime and its spatial variance tau_beta
     beta_space <- rep(0, N.spacetime * N.space)
     tau_beta <- 0
-    if (include.multiplicative.annual.resid) {
+    if (include.multiplicative.spatial.effect) {
         RRR <- Y - mu - alpha_time[time.id] - beta_time[time.id] * X - alpha_space[Z_ID]
         beta_space <- as.numeric(1 / X_S * t(Gamma_space) %*% (X * RRR))
         tau_beta <- as.numeric(stats::var(beta_space, na.rm = T))
@@ -487,7 +487,7 @@ grm <- function(Y,
         sigma2 <- 1 / stats::rgamma(1, length(RRR) / 2 + sigma.a, sum(RRR ^ 2) / 2 + sigma.b)
        
 
-        if (include.additive.annual.resid) {
+        if (include.additive.spatial.effect) {
 
             MMM <- MMM - alpha_space[Z_ID]
             RRR <- Y - MMM
@@ -564,7 +564,7 @@ grm <- function(Y,
 
       
         #Update spatial coefficent for AOD if GP
-        if (include.multiplicative.annual.resid) {
+        if (include.multiplicative.spatial.effect) {
 
                     MMM <- MMM - beta_space[Z_ID] * X
                     RRR <- Y - MMM
@@ -641,7 +641,7 @@ grm <- function(Y,
         }
       
         #Update temporal intercepts and its parameters
-        if (include.additive.weekly.resid) {
+        if (include.additive.temporal.effect) {
             MMM = MMM - alpha_time[time.id]
             RRR = Y - MMM
             XXX = 1 / sigma2 * t(Gamma_time) %*% RRR
@@ -661,7 +661,7 @@ grm <- function(Y,
         }
 
         #Update temporal AOD coefficients
-        if (include.multiplicative.weekly.resid) {
+        if (include.multiplicative.temporal.effect) {
             MMM = MMM - beta_time[time.id] * X
             RRR = Y - MMM
             XXX = 1 / sigma2 * t(Gamma_time) %*% (X * RRR)

@@ -13,8 +13,8 @@ grm_pred(
   space.id,
   time.id,
   spacetime.id,
-  include.additive.annual.resid = T,
-  include.multiplicative.annual.resid = T,
+  include.additive.spatial.effect = T,
+  include.multiplicative.spatial.effect = T,
   n.iter = 500,
   verbose = TRUE,
   in.sample = FALSE
@@ -37,9 +37,9 @@ grm_pred(
 
 \item{spacetime.id}{ID vector of time points where spatial trends vary (n)}
 
-\item{include.additive.annual.resid}{Include additive spatial (annual) residual bias not explained by other inputes}
+\item{include.additive.spatial.effect}{Include additive spatial random effects.}
 
-\item{include.multiplicative.annual.resid}{Include multiplicative spatial (weekly) residual bias not explained by other inputes}
+\item{include.multiplicative.spatial.effect}{Include multiplicative spatial random effects.}
 
 \item{n.iter}{Number of iterations used in predictions. Must be <= than post-thined and burned iterations from grm.fit}
 

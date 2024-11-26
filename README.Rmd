@@ -35,7 +35,7 @@ remotes::install_github("WyattGMadden/ensembleDownscaleR")
 
 ## Example
 
-```{r example-stage-1, eval = F}
+```{r example-stage-0, eval = F}
 library(ensembleDownscaleR)
 ```
 
@@ -107,8 +107,6 @@ cmaq_pred <- grm_pred(
     time.id = cmaq_full$time_id,
     space.id = cmaq_full$space_id,
     spacetime.id = cmaq_full$spacetime_id,
-    include.additive.annual.resid = T,
-    include.multiplicative.annual.resid = T,
     n.iter = 10,
     verbose = T
 )
@@ -127,8 +125,6 @@ modis_pred <- grm_pred(
     time.id = modis_full$time_id, 
     space.id = modis_full$space_id, 
     spacetime.id = modis_full$spacetime_id,
-    include.additive.annual.resid = T,
-    include.multiplicative.annual.resid = T,
     n.iter = 10,
     verbose = T)
 
@@ -193,7 +189,7 @@ modis_fit_cv <- grm_cv(
 
 ### Stage 4
 
-```{r example-stage-3, eval = F}
+```{r example-stage-4, eval = F}
 
 ensemble_fit <- ensemble_spatial(
     grm.fit.cv.1 = cmaq_fit_cv,
