@@ -5,7 +5,7 @@
 #' @inheritParams grm
 #' @param grm.pred.1 Output from grm_pred() function for first primary variable
 #' @param grm.pred.2 Output from grm_pred() function for second primary variable
-#' @param weights Ensemble weights output from weight_pred 
+#' @param weights Output from weight_pred() or ensemble_fit(), depending on if you want ensemble predictions at full prediction locations or observation locations respectively.
 #'
 #' @return A list including ensemble predictions and standard deviations
 #'
@@ -39,7 +39,7 @@ gap_fill <- function(grm.pred.1,
 
 
   
-    weights <- weights$weights
+    weights <- weights$q
     W <- 1 / (exp(-weights) + 1)
     W.mean <-  apply(W, 1, mean)
     W.sd <-  apply(1 / (exp(-weights) + 1), 1, stats::sd)

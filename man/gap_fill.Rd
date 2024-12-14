@@ -11,7 +11,7 @@ gap_fill(grm.pred.1, grm.pred.2, weights)
 
 \item{grm.pred.2}{Output from grm_pred() function for second primary variable}
 
-\item{weights}{Ensemble weights output from weight_pred}
+\item{weights}{Output from weight_pred() or ensemble_fit(), depending on if you want ensemble predictions at full prediction locations or observation locations respectively.}
 }
 \value{
 A list including ensemble predictions and standard deviations
