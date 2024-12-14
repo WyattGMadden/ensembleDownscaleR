@@ -160,10 +160,12 @@ ensemble_spatial <- function(grm.fit.cv.1,
                             theta = theta.save, 
                             dev = dev.save)
   
-    list(q = q.save, 
-         other = other.save, 
-         theta.acc = theta.acc / n.iter,
-         locations = locs)
+    return(
+        list(q = q.save, 
+             other = other.save, 
+             theta.acc = theta.acc / n.iter,
+             locations = locs)
+        )
 
 }
 

@@ -60,9 +60,13 @@ gap_fill <- function(grm.pred.1,
     SD.ensemb <- Y.sd.1
     SD.ensemb[which.use] <- Est.SD
       
-    list(ensemble.estimate = Est.ensemb,
-         ensemble.sd = SD.ensemb,
-         time.id = grm.pred.1$time.id,
-         space.id = grm.pred.1$space.id,
-         spacetime.id = grm.pred.1$spacetime.id)
+    return(
+        data.frame(
+            ensemble.estimate = Est.ensemb,
+            ensemble.sd = SD.ensemb,
+            time.id = grm.pred.1$time.id,
+            space.id = grm.pred.1$space.id,
+            spacetime.id = grm.pred.1$spacetime.id
+            )
+        )
 }
