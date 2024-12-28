@@ -209,7 +209,7 @@ grm_cv <- function(Y,
     }
  
     Y.cv$upper.95 <- Y.cv$estimate + 1.96 * Y.cv$sd
-    Y.cv$lower95 <- Y.cv$estimate - 1.96 * Y.cv$sd
+    Y.cv$lower.95 <- Y.cv$estimate - 1.96 * Y.cv$sd
   
     return(Y.cv)
 }

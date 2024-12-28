@@ -5,7 +5,7 @@
 #'
 #' @inheritParams grm
 #' @param num.folds Number of folds used in the cross validation process (default = 10)
-#' @param type Type of cross validation to be performed. Options are "spatial", "ordinary", or "spatial_clustered". (default = "spatial")
+#' @param type Type of cross validation to be performed. Options are "spatial", "ordinary", "spatial_clustered", or "spatial_buffered". (default = "spatial")
 #' @param buffer.size Radius of buffer size, if type = "spatial_buffered" (default = 0)    
 #'
 #' @return A named list containing a vector of cross validation ID's, number of folds, and cross validation type. 
