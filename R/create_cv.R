@@ -161,15 +161,15 @@ create_cv_from_previous <- function(previous.cv.object,
                                     time.id,
                                     coords = NULL) {
 
-  type <- previous_cv_object$type
-  num.folds <- previous_cv_object$num.folds
-  old_cv_id <- previous_cv_object$cv.id
-  old_dropmat <- previous_cv_object$drop.matrix  # may be NULL if not "spatial_buffered"
+  type <- previous.cv.object$type
+  num.folds <- previous.cv.object$num.folds
+  old_cv_id <- previous.cv.object$cv.id
+  old_dropmat <- previous.cv.object$drop.matrix  # may be NULL if not "spatial_buffered"
 
   df_old <- data.frame(
-    space_id = previous_cv_object$space.id,
-    time_id = previous_cv_object$time.id,
-    cv_id = previous_cv_object$cv.id
+    space_id = previous.cv.object$space.id,
+    time_id = previous.cv.object$time.id,
+    cv_id = previous.cv.object$cv.id
   )
   df_new <- data.frame(
     space_id = space.id,
