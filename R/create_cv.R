@@ -8,12 +8,8 @@
 #' @param type Type of cross validation to be performed. Options are "spatial", "ordinary", "spatial_clustered", or "spatial_buffered". (default = "spatial")
 #' @param buffer.size Radius of buffer size, if type = "spatial_buffered" (default = 0)    
 #'
-#' @return A named list containing a vector of cross validation ID's, number of folds, and cross validation type. 
+#' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 #'
-#' @examples
-#' # grm_cv()
-#' 
-#' 
 #' @export
 create_cv <- function(space.id,
                       time.id,
@@ -139,8 +135,150 @@ create_cv <- function(space.id,
     return(list(cv.id = cv_id_full, 
                 num.folds = num.folds, 
                 type = type,
-                drop.matrix = drop_matrix))
+                drop.matrix = drop_matrix,
+                time.id = time.id,
+                space.id = space.id,
+                coords = coords,
+                buffer.size = buffer.size
+                ))
 }
+
+
+#' Create Cross Validation ID's For New Dataset Based On Previously Created Cross Validation ID's
+#'
+#' This function creates a vector of cross validation ID's for a given number of folds and type of cross validation. 
+#'
+#' @inheritParams grm
+#' @param num.folds Number of folds used in the cross validation process (default = 10)
+#' @param type Type of cross validation to be performed. Options are "spatial", "ordinary", "spatial_clustered", or "spatial_buffered". (default = "spatial")
+#' @param buffer.size Radius of buffer size, if type = "spatial_buffered" (default = 0)    
+#'
+#' @return A named list containing a vector of cross validation ID's, number of folds, and cross validation type. 
+#'
+#' @export
+
+create_cv_from_previous <- function(previous_cv_object,
+                                    space.id,
+                                    time.id,
+                                    coords = NULL) {
+
+  type <- previous_cv_object$type
+  num.folds <- previous_cv_object$num.folds
+  old_cv_id <- previous_cv_object$cv.id
+  old_dropmat <- previous_cv_object$drop.matrix  # may be NULL if not "spatial_buffered"
+
+  df_old <- data.frame(
+    space_id = previous_cv_object$space.id,
+    time_id = previous_cv_object$time.id,
+    cv_id = previous_cv_object$cv.id
+  )
+  df_new <- data.frame(
+    space_id = space.id,
+    time_id  = time.id
+  )
+
+  # Merge old assignments into new
+  df_new <- merge(
+    df_new,
+    df_old,
+    by    = c("space_id","time_id"),
+    all.x = TRUE,
+    sort  = FALSE
+  )
+  # df_new now has columns: space_id, time_id, cv_id (NA if new combo)
+
+  # Only "ordinary" depends on both time and space.
+  # For new combos under "ordinary", replicate the original logic:
+  #   - group by space_id
+  #   - if # combos < num.folds => cv_id=0
+  #   - else => random shuffle of folds 1..num.folds
+  if (type == "ordinary") {
+    new_rows <- which(is.na(df_new$cv_id))
+    if (length(new_rows) > 0) {
+      site_groups <- split(new_rows, df_new$space_id[new_rows])
+      for (s in names(site_groups)) {
+        idx   <- site_groups[[s]]
+        n_obs <- length(idx)
+        if (n_obs < num.folds) {
+          df_new$cv_id[idx] <- 0
+        } else {
+          folds_seq         <- (1:num.folds)[(1:n_obs) %% num.folds + 1]
+          folds_seq         <- sample(folds_seq, replace = FALSE)
+          df_new$cv_id[idx] <- folds_seq
+        }
+      }
+    }
+  } else {
+    # For "spatial", "spatial_clustered", "spatial_buffered", etc.,
+    # time does not affect assignment. All space IDs appear in old + new,
+    # so new combos simply inherit the old space's fold if it exists,
+    # which was already merged in df_new. (No new site IDs.)
+  }
+
+  # Zero out min/max time
+  all_time_ids  <- df_new$time_id
+  idx_min_time  <- which(all_time_ids == 1)
+  idx_max_time  <- which(all_time_ids == max(all_time_ids))
+  df_new$cv_id[idx_min_time] <- 0
+  df_new$cv_id[idx_max_time] <- 0
+
+  # If "spatial_buffered", recalc drop matrix for the new data
+  new_dropmat <- NULL
+  if (type == "spatial_buffered") {
+    if (is.null(new_coords) || is.null(buffer.size)) {
+      stop("For spatial_buffered, must supply new_coords and buffer.size.")
+    }
+    # Middle rows only
+    rows_mid <- setdiff(seq_len(nrow(df_new)), c(idx_min_time, idx_max_time))
+    if (length(rows_mid) == 0) {
+      # No middle rows
+      new_dropmat <- matrix(0, nrow = nrow(df_new), ncol = num.folds)
+    } else {
+      # Distances among unique space IDs in the middle chunk
+      coords_mid   <- new_coords[rows_mid, , drop=FALSE]
+      space_mid    <- df_new$space_id[rows_mid]
+      cv_mid       <- df_new$cv_id[rows_mid]
+      locs <- unique(cbind(space_mid, coords_mid, cv_mid))
+      colnames(locs) <- c("space_id","x","y","cv_id_mid")
+      locs <- locs[order(locs[,"space_id"]), ]
+
+      dist_mat       <- as.matrix(dist(locs[,c("x","y")]))
+      new_dropmat_mid<- matrix(0, nrow = nrow(locs), ncol = num.folds)
+
+      for (fold_i in seq_len(num.folds)) {
+        fold_sites     <- locs[locs[,"cv_id_mid"] == fold_i, "space_id"]
+        non_fold_sites <- locs[locs[,"cv_id_mid"] != fold_i, "space_id"]
+        if (length(fold_sites)==0 || length(non_fold_sites)==0) next
+        dist_cv_ncv    <- dist_mat[fold_sites, non_fold_sites, drop=FALSE]
+        spat_id_to_drop<- non_fold_sites[
+          apply(dist_cv_ncv, 2, function(x) sum(x < buffer.size) > 0)
+        ]
+        new_dropmat_mid[, fold_i] <- locs[,"space_id"] %in% spat_id_to_drop
+      }
+
+      # Expand to full data
+      new_dropmat <- matrix(0, nrow = nrow(df_new), ncol = num.folds)
+      site_map <- match(space_mid, locs[,"space_id"])
+      for (i in seq_along(rows_mid)) {
+        row_idx  <- rows_mid[i]
+        site_idx <- site_map[i]
+        new_dropmat[row_idx, ] <- new_dropmat_mid[site_idx, ]
+      }
+    }
+  }
+
+  list(
+    cv.id = df_new$cv_id,
+    num.folds = num.folds,
+    type = type,
+    drop.matrix = new_dropmat,
+    time.id = df_new$time_id,
+    space.id = df_new$space_id,
+    coords = coords,
+    buffer.size = buffer.size
+  )
+}
+
 
 #' Get Spatial Cross Validate ID's For Regular Spatial Cross Validation
 #'
