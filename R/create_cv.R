@@ -162,6 +162,7 @@ create_cv_from_previous <- function(previous.cv.object,
                                     coords = NULL) {
 
   type <- previous.cv.object$type
+  buffer.size <- previous.cv.object$buffer.size
   num.folds <- previous.cv.object$num.folds
   old_cv_id <- previous.cv.object$cv.id
   old_dropmat <- previous.cv.object$drop.matrix  # may be NULL if not "spatial_buffered"
@@ -224,9 +225,6 @@ create_cv_from_previous <- function(previous.cv.object,
   # If "spatial_buffered", recalc drop matrix for the new data
   new_dropmat <- NULL
   if (type == "spatial_buffered") {
-    if (is.null(new_coords) || is.null(buffer.size)) {
-      stop("For spatial_buffered, must supply new_coords and buffer.size.")
-    }
     # Middle rows only
     rows_mid <- setdiff(seq_len(nrow(df_new)), c(idx_min_time, idx_max_time))
     if (length(rows_mid) == 0) {
