@@ -18,7 +18,6 @@ grm_cv(
   include.additive.spatial.effect = T,
   include.multiplicative.temporal.effect = T,
   include.multiplicative.spatial.effect = T,
-  num_neighbors = 10,
   n.iter = 25000,
   burn = 5000,
   thin = 4,
@@ -73,8 +72,6 @@ grm_cv(
 \item{include.multiplicative.temporal.effect}{Include multiplicative temporal random effects.}
 
 \item{include.multiplicative.spatial.effect}{Include multiplicative spatial random effects.}
-
-\item{num_neighbors}{Number of nearest neighbors to use in NNGP}
 
 \item{n.iter}{Number of iterations used in predictions. Must be <= than post-thined and burned iterations from grm.fit}
 

@@ -20,20 +20,15 @@ create_cv(
 
 \item{num.folds}{Number of folds used in the cross validation process (default = 10)}
 
-\item{type}{Type of cross validation to be performed. Options are "spatial", "ordinary", or "spatial_clustered". (default = "spatial")}
+\item{type}{Type of cross validation to be performed. Options are "spatial", "ordinary", "spatial_clustered", or "spatial_buffered". (default = "spatial")}
 
 \item{coords}{Matrix of x y coordinates, with colnames(coords) == c("x", "y"), (n, 2)}
 
 \item{buffer.size}{Radius of buffer size, if type = "spatial_buffered" (default = 0)}
 }
 \value{
-A named list containing a vector of cross validation ID's, number of folds, and cross validation type.
+A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.
 }
 \description{
 This function creates a vector of cross validation ID's for a given number of folds and type of cross validation.
-}
-\examples{
-# grm_cv()
-
-
 }

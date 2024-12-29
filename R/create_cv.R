@@ -146,18 +146,17 @@ create_cv <- function(space.id,
 
 #' Create Cross Validation ID's For New Dataset Based On Previously Created Cross Validation ID's
 #'
-#' This function creates a vector of cross validation ID's for a given number of folds and type of cross validation. 
+#' This function creates creates a cross-validation assignment for a new dataset, based off a previously created cross-validation assignment
+#' This previous spatial or spatial/temporal assignments, depending on the type of CV used. 
 #'
 #' @inheritParams grm
-#' @param num.folds Number of folds used in the cross validation process (default = 10)
-#' @param type Type of cross validation to be performed. Options are "spatial", "ordinary", "spatial_clustered", or "spatial_buffered". (default = "spatial")
-#' @param buffer.size Radius of buffer size, if type = "spatial_buffered" (default = 0)    
+#' @param previous.cv.object Number of folds used in the cross validation process (default = 10)
 #'
-#' @return A named list containing a vector of cross validation ID's, number of folds, and cross validation type. 
+#' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 #'
 #' @export
 
-create_cv_from_previous <- function(previous_cv_object,
+create_cv_from_previous <- function(previous.cv.object,
                                     space.id,
                                     time.id,
                                     coords = NULL) {

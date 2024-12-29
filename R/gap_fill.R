@@ -2,7 +2,6 @@
 #'
 #' This functions uses the weights and predictions from the previous separate grm's to make ensemble predictions
 #'
-#' @inheritParams grm
 #' @param grm.pred.1 Output from grm_pred() function for first primary variable
 #' @param grm.pred.2 Output from grm_pred() function for second primary variable
 #' @param weights Output from weight_pred() or ensemble_fit(), depending on if you want ensemble predictions at full prediction locations or observation locations respectively.
