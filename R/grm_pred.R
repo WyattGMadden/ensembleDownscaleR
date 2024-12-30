@@ -63,36 +63,36 @@ grm_pred <- function(grm.fit,
         ############################
         ###standardize X, L and M###
         ############################
-        X <- scale(X)[, 1]
+
+
+        standardize.param <- grm.fit$standardize.param
+
+        X <- (X - standardize.param[standardize.param$Type == "X", ]$Mean) / 
+            standardize.param[standardize.param$Type == "X", ]$SD
 
         if (!is.null(L)) {
+
             L <- as.matrix(L)
-            # scale unless variable is all one value 
-            #(can happen in cross validation with binary variables)
-            L <- apply(X = L, 
-                            MARGIN = 2, 
-                            FUN = function(x) {
-                                if (length(unique(x)) > 1) {
-                                    x <- scale(x)
-                                }
-                                return(x)
-                            }
-                            )
+            L.var <- as.character(standardize.param[standardize.param$Type == "L", ]$Name)
+
+            for (l in L.var) {
+                L[, colnames(L) == l] <- (L[, colnames(L) == l] - 
+                                                   standardize.param[standardize.param$Name == l, ]$Mean) / 
+                standardize.param[standardize.param$Name == l, ]$SD
+            }
         }
 
         if (!is.null(M)) {
+
             M <- as.matrix(M)
-            # scale unless variable is all one value 
-            #(can happen in cross validation with binary variables)
-            M <- apply(X = M, 
-                            MARGIN = 2, 
-                            FUN = function(x) {
-                                if (length(unique(x)) > 1) {
-                                    x <- scale(x)
-                                }
-                                return(x)
-                            }
-                            )
+            M.var <- as.character(standardize.param[standardize.param$Type == "M", ]$Name)
+
+            for (m in M.var) {
+                M[, colnames(M) == m] <- (M[, colnames(M) == m] - 
+                                                   standardize.param[standardize.param$Name == m, ]$Mean) / 
+                standardize.param[standardize.param$Name == m, ]$SD
+            }
+
         }
 
 
