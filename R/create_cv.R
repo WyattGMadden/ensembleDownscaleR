@@ -232,7 +232,7 @@ create_cv_from_previous <- function(previous.cv.object,
       new_dropmat <- matrix(0, nrow = nrow(df_new), ncol = num.folds)
     } else {
       # Distances among unique space IDs in the middle chunk
-      coords_mid   <- new_coords[rows_mid, , drop=FALSE]
+      coords_mid   <- coords[rows_mid, , drop=FALSE]
       space_mid    <- df_new$space_id[rows_mid]
       cv_mid       <- df_new$cv_id[rows_mid]
       locs <- unique(cbind(space_mid, coords_mid, cv_mid))
