@@ -7,11 +7,78 @@
 #' @param num.folds Number of folds used in the cross validation process (default = 10)
 #' @param type Type of cross validation to be performed. Options are "spatial", "ordinary", "spatial_clustered", or "spatial_buffered". (default = "spatial")
 #' @param buffer.size Radius of buffer size, if type = "spatial_buffered" (default = 0)    
+#' @param create.from Optional cross-validation object, used to determine the cross-validation assignment for the new dataset. space.id (and time.id for "ordinary") cross-validation fold assignments will match those for the provided CV object, if present. (default = NULL)
 #'
 #' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 #'
 #' @export
 create_cv <- function(space.id,
+                      time.id,
+                      num.folds = 10,
+                      type = "ordinary",
+                      coords = NULL,
+                      buffer.size = NULL,
+                      create.from = NULL) {
+    # if not "ordinary", must supply coords
+    if (type != "ordinary" && is.null(coords)) {
+        stop("coords must be provided for spatial, spatial_clustered, or spatial_buffered cross validation")
+    }
+    # space.id and time.id must be same length
+    if (length(space.id) != length(time.id)) {
+        stop("space.id and time.id must be the same length")
+    }
+    # num folds must be greater than 1 and integer
+    if (!is.integer(num.folds) || num.folds < 2) {
+        stop("num.folds must be an integer greater than 1")
+    }
+    # buffer.size must be numeric, and one value
+    if (!is.null(buffer.size) && (!is.numeric(buffer.size) || length(buffer.size) != 1)) {
+        stop("buffer.size must be a numeric value")
+    }
+
+    if (is.null(create.from)) {
+        cv.output <- create_cv_original(
+            space.id = space.id,
+            time.id = time.id,
+            num.folds = num.folds,
+            type = type,
+            coords = coords,
+            buffer.size = buffer.size
+        )
+    } else {
+        # error if unique space ids not shared
+        if (!all(sort(unique(space.id)) == sort(unique(create.from$space.id)))) {
+            stop("Unique space IDs in new data do not match those in the CV object.")
+        }
+        # verify create.from is cv object (list with correct names)
+        if (!all(c("cv.id", "num.folds", "type", "drop.matrix", "time.id", "space.id", "coords", "buffer.size") %in% names(create.from))) {
+            stop("create.from must be a cross-validation object created by create_cv()")
+        }
+
+
+        cv.output <- create_cv_from_previous(
+            previous.cv.object = create.from,
+            space.id = space.id,
+            time.id = time.id,
+            coords = coords
+        )
+    }
+    return(cv.output)
+}
+
+
+#' Create Cross Validate ID's
+#'
+#' This function creates a vector of cross validation ID's for a given number of folds and type of cross validation. 
+#'
+#' @inheritParams grm
+#' @param num.folds Number of folds used in the cross validation process (default = 10)
+#' @param type Type of cross validation to be performed. Options are "spatial", "ordinary", "spatial_clustered", or "spatial_buffered". (default = "spatial")
+#' @param buffer.size Radius of buffer size, if type = "spatial_buffered" (default = 0)    
+#'
+#' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
+#'
+create_cv_original <- function(space.id,
                       time.id,
                       num.folds = 10,
                       type = "spatial",
@@ -149,7 +216,7 @@ create_cv <- function(space.id,
 #' This function creates creates a cross-validation assignment for a new dataset, based off a previously created cross-validation assignment
 #'
 #' @inheritParams grm
-#' @param previous.cv.object Number of folds used in the cross validation process (default = 10)
+#' @param previous.cv.object The cross-validation object created from the original dataset, used to determine the cross-validation assignment for the new dataset
 #'
 #' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 #'
