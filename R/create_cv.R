@@ -155,7 +155,6 @@ create_cv <- function(space.id,
 #' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 #'
 #' @export
-
 create_cv_from_previous <- function(previous.cv.object,
                                     space.id,
                                     time.id,
