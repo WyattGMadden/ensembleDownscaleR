@@ -147,7 +147,6 @@ create_cv <- function(space.id,
 #' Create Cross Validation ID's For New Dataset Based On Previously Created Cross Validation ID's
 #'
 #' This function creates creates a cross-validation assignment for a new dataset, based off a previously created cross-validation assignment
-#' This previous spatial or spatial/temporal assignments, depending on the type of CV used. 
 #'
 #' @inheritParams grm
 #' @param previous.cv.object Number of folds used in the cross validation process (default = 10)

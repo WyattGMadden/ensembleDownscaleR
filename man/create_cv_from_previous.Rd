@@ -20,5 +20,4 @@ A named list containing a vector of cross validation ID's, a matrix of which obs
 }
 \description{
 This function creates creates a cross-validation assignment for a new dataset, based off a previously created cross-validation assignment
-This previous spatial or spatial/temporal assignments, depending on the type of CV used.
 }
