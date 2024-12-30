@@ -302,7 +302,7 @@ create_cv_from_previous <- function(previous.cv.object,
       colnames(locs) <- c("space_id","x","y","cv_id_mid")
       locs <- locs[order(locs[,"space_id"]), ]
 
-      dist_mat       <- as.matrix(dist(locs[,c("x","y")]))
+      dist_mat       <- as.matrix(stats::dist(locs[,c("x","y")]))
       new_dropmat_mid<- matrix(0, nrow = nrow(locs), ncol = num.folds)
 
       for (fold_i in seq_len(num.folds)) {

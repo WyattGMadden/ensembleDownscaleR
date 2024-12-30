@@ -7,7 +7,7 @@
 create_cv(
   space.id,
   time.id,
-  num.folds = 10,
+  num.folds = 10L,
   type = "ordinary",
   coords = NULL,
   buffer.size = NULL,
