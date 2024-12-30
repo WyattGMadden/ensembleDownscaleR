@@ -14,7 +14,7 @@
 #' @export
 create_cv <- function(space.id,
                       time.id,
-                      num.folds = 10,
+                      num.folds = 10L,
                       type = "ordinary",
                       coords = NULL,
                       buffer.size = NULL,
@@ -28,7 +28,7 @@ create_cv <- function(space.id,
         stop("space.id and time.id must be the same length")
     }
     # num folds must be greater than 1 and integer
-    if (!is.integer(num.folds) || num.folds < 2) {
+    if (!is.numeric(num.folds) || num.folds < 2) {
         stop("num.folds must be an integer greater than 1")
     }
     # buffer.size must be numeric, and one value
@@ -219,8 +219,6 @@ create_cv_original <- function(space.id,
 #' @param previous.cv.object The cross-validation object created from the original dataset, used to determine the cross-validation assignment for the new dataset
 #'
 #' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
-#'
-#' @export
 create_cv_from_previous <- function(previous.cv.object,
                                     space.id,
                                     time.id,

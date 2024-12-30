@@ -7,7 +7,7 @@
 create_cv_from_previous(previous.cv.object, space.id, time.id, coords = NULL)
 }
 \arguments{
-\item{previous.cv.object}{Number of folds used in the cross validation process (default = 10)}
+\item{previous.cv.object}{The cross-validation object created from the original dataset, used to determine the cross-validation assignment for the new dataset}
 
 \item{space.id}{Spatial location ID vector (n)}
 
