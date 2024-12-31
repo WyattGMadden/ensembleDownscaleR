@@ -10,7 +10,7 @@
 #' @param space.id Space id for first primary variable predictions
 #'
 #' @return A list with:
-#' \itemize{
+#' \describe{
 #'   \item{\code{q}}{ : A matrix of imputed log-odds (weights) for each location, of dimension \code{(n.cell x n.iter)}.}
 #'   \item{\code{locations}}{ : The \code{coords} and \code{space.id} used for prediction, in ordered form.}
 #' }

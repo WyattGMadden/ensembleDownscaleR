@@ -17,7 +17,7 @@ weight_pred(ensemble.fit, coords, space.id, verbose = TRUE)
 }
 \value{
 A list with:
-\itemize{
+\describe{
 \item{\code{q}}{ : A matrix of imputed log-odds (weights) for each location, of dimension \code{(n.cell x n.iter)}.}
 \item{\code{locations}}{ : The \code{coords} and \code{space.id} used for prediction, in ordered form.}
 }

@@ -13,7 +13,7 @@
 #' @param theta.b Second theta prior hyperparameter
 #'
 #' @return A list containing:
-#' \itemize{
+#' \describe{
 #'  \item{\code{q}}{ : Posterior samples for the log-odds q (spatially varying), plus space IDs.}
 #'  \item{\code{other}}{ : A data frame with posterior samples of \code{tau2}, \code{theta}, and \code{dev} (DIC-like measure).}
 #'  \item{\code{theta.acc}}{ : Acceptance rate for the \code{theta} parameter.}
