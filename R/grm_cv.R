@@ -97,7 +97,7 @@ grm_cv <- function(
     
     # L, M checks
     if (!is.null(L)) {
-        if (!is.matrix(L) | !is.data.frame(L)) {
+        if (!is.matrix(L) & !is.data.frame(L)) {
             stop("'L' must be a matrix, data.frame, or NULL.")
         }
         if (nrow(L) != length(Y)) {
@@ -105,7 +105,7 @@ grm_cv <- function(
         }
     }
     if (!is.null(M)) {
-        if (!is.matrix(M) | !is.data.frame(M)) {
+        if (!is.matrix(M) & !is.data.frame(M)) {
             stop("'M' must be a matrix, data.frame, or NULL.")
         }
         if (nrow(M) != length(Y)) {

@@ -136,8 +136,8 @@ cmaq_fit_cv <- grm_cv(
     spacetime.id = cmaq_aqs_matched$spacetime_id
 )
 
-cv_id_modis_ord <- create_cv_from_previous(
-    previous.cv.object = cv_id_cmaq_ord,
+cv_id_modis_ord <- create_cv(
+    create.from = cv_id_cmaq_ord,
     space.id = modis_aqs_matched$space_id,
     time.id = modis_aqs_matched$time_id,
 )
