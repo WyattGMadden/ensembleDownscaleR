@@ -60,10 +60,10 @@ create_cv <- function(space.id,
         if (!all(c("cv.id", "num.folds", "type", "drop.matrix", "time.id", "space.id", "coords", "buffer.size") %in% names(create.from))) {
             stop("create.from must be a cross-validation object created by create_cv()")
         }
-        if (!type %in% c("spatial", "spatial_clustered", "spatial_buffered")) {
+        if (!create.from$type %in% c("spatial", "spatial_clustered", "spatial_buffered")) {
             stop("Can only use create.from for spatial-type CV (spatial, spatial_clustered, spatial_buffered).")
         }
-        if (create.from == "spatial_buffered" & is.null(coords)) {
+        if (create.from$type == "spatial_buffered" & is.null(coords)) {
           stop("Must provide 'coords' for spatial_buffered re-creation.")
         }
 
