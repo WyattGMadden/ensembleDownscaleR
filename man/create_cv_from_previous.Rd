@@ -4,7 +4,7 @@
 \alias{create_cv_from_previous}
 \title{Create Cross Validation ID's For New Dataset Based On Previously Created Cross Validation ID's}
 \usage{
-create_cv_from_previous(previous.cv.object, space.id, time.id, coords = NULL)
+create_cv_from_previous(previous.cv.object, space.id, time.id, coords)
 }
 \arguments{
 \item{previous.cv.object}{The cross-validation object created from the original dataset, used to determine the cross-validation assignment for the new dataset}

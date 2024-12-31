@@ -234,7 +234,7 @@ create_cv_original <- function(space.id,
 create_cv_from_previous <- function(previous.cv.object,
                                     space.id,
                                     time.id,
-                                    coords = NULL) {
+                                    coords) {
   type <- previous.cv.object$type
   buffer.size <- previous.cv.object$buffer.size
   num.folds <- previous.cv.object$num.folds
@@ -242,79 +242,40 @@ create_cv_from_previous <- function(previous.cv.object,
   old_dropmat <- previous.cv.object$drop.matrix
 
 
-  df_old <- data.frame(
-    space_id = previous.cv.object$space.id,
-    time_id = previous.cv.object$time.id,
-    cv_id = old_cv_id
-  )
-  df_new <- data.frame(
-    space_id = space.id,
-    time_id = time.id
-  )
-
-  df_old <- stats::aggregate(
-    cv_id ~ space_id + time_id, data = df_old,
-    FUN = function(x) x[1]
-  )
-
-  df_new <- merge(
-    df_new,
-    df_old,
-    by = c("space_id", "time_id"),
-    all.x = TRUE,
-    sort = FALSE
-  )
-
-  idx_min_time <- which(df_new$time_id == min(df_new$time_id))
-  idx_max_time <- which(df_new$time_id == max(df_new$time_id))
-  df_new$cv_id[idx_min_time] <- 0
-  df_new$cv_id[idx_max_time] <- 0
-
-  new_dropmat <- NULL
+  # remove zeros from old cv
+  zero_inds <- which(old_cv_id == 0)
+  old_space_id_nozero <- previous.cv.object$space.id[-zero_inds]
+  old_cv_id_nozero <- old_cv_id[-zero_inds]
   if (type == "spatial_buffered") {
-    rows_mid <- setdiff(seq_len(nrow(df_new)), c(idx_min_time, idx_max_time))
-    if (length(rows_mid) == 0) {
-      new_dropmat <- matrix(0, nrow = nrow(df_new), ncol = num.folds)
-    } else {
-      coords_mid <- coords[rows_mid, , drop = FALSE]
-      space_mid <- df_new$space_id[rows_mid]
-      cv_mid <- df_new$cv_id[rows_mid]
-
-      locs <- data.frame(space_mid, coords_mid, cv_mid)
-      colnames(locs) <- c("space_id", "x", "y", "cv_id_mid")
-      locs <- locs[order(locs$space_id), ]
-
-      dist_mat <- as.matrix(stats::dist(locs[, c("x", "y")]))
-      new_dropmat_mid <- matrix(0, nrow = nrow(locs), ncol = num.folds)
-      for (fold_i in seq_len(num.folds)) {
-        fold_sites <- locs$space_id[locs$cv_id_mid == fold_i]
-        non_fold_sites <- locs$space_id[locs$cv_id_mid != fold_i]
-        if (length(fold_sites) == 0 || length(non_fold_sites) == 0) next
-
-        dist_cv_ncv <- dist_mat[fold_sites, non_fold_sites, drop = FALSE]
-        spat_id_to_drop <- non_fold_sites[
-          apply(dist_cv_ncv, 2, function(x) sum(x < buffer.size) > 0)
-        ]
-        new_dropmat_mid[, fold_i] <- locs$space_id %in% spat_id_to_drop
-      }
-
-      new_dropmat <- matrix(0, nrow = nrow(df_new), ncol = num.folds)
-      site_map <- match(space_mid, locs$space_id)
-      for (k in seq_along(rows_mid)) {
-        row_idx <- rows_mid[k]
-        site_idx <- site_map[k]
-        new_dropmat[row_idx, ] <- new_dropmat_mid[site_idx, ]
-      }
-    }
+    old_dropmat_nozero <- old_dropmat[-zero_inds, ]
   }
 
+  # get unique space ids and corresponding cv id's
+  unique_space_id <- sort(unique(old_space_id_nozero))
+  first_ocurrence_index <- match(unique_space_id, old_space_id_nozero)
+  cv_id_unique <- old_cv_id_nozero[first_ocurrence_index]
+
+
+  # build new cv id's
+  new_inds <- match(space.id, unique_space_id)
+  new_cv_id <- cv_id_unique[new_inds]
+  new_dropmat <- NULL
+  if (type == "spatial_buffered") {
+    new_dropmat <- old_dropmat_nozero[new_inds, ]
+  }
+
+  # set first and last time observations to 0
+  new_cv_id[time.id == min(time.id)] <- 0
+  new_cv_id[time.id == max(time.id)] <- 0
+
+
   list(
-    cv.id = df_new$cv_id,
+    cv.id = new_cv_id,
     num.folds = num.folds,
     type = type,
     drop.matrix = new_dropmat,
-    time.id = df_new$time_id,
-    space.id = df_new$space_id,
+    time.id = time.id,
+    space.id = space.id,
     coords = coords,
     buffer.size = buffer.size
   )
