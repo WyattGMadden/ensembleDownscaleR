@@ -58,7 +58,7 @@ grm_pred <- function(
         if (!is.matrix(L) & !is.data.frame(L)) {
             stop("'L' must be a matrix, data.frame, or NULL.")
         }
-        if (nrow(L) != length(Y)) {
+        if (nrow(L) != length(X)) {
             stop("Number of rows in 'L' must match length of 'Y'.")
         }
     }
@@ -66,7 +66,7 @@ grm_pred <- function(
         if (!is.matrix(M) & !is.data.frame(M)) {
             stop("'M' must be a matrix, data.frame, or NULL.")
         }
-        if (nrow(M) != length(Y)) {
+        if (nrow(M) != length(X)) {
             stop("Number of rows in 'M' must match length of 'Y'.")
         }
     }
