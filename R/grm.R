@@ -108,16 +108,16 @@ grm <- function(
         stop("'Y' and 'X' must have the same length.")
     }
     if (!is.null(L)) {
-        if (!is.matrix(L)) {
-            stop("'L' must be a matrix or NULL.")
+        if (!is.matrix(L) | !is.data.frame(L)) {
+            stop("'L' must be a matrix, data.frame, or NULL.")
         }
         if (nrow(L) != length(Y)) {
             stop("Number of rows in 'L' must match length of 'Y'.")
         }
     }
     if (!is.null(M)) {
-        if (!is.matrix(M)) {
-            stop("'M' must be a matrix or NULL.")
+        if (!is.matrix(M) | !is.data.frame(M)) {
+            stop("'M' must be a matrix, data.frame, or NULL.")
         }
         if (nrow(M) != length(Y)) {
             stop("Number of rows in 'M' must match length of 'Y'.")

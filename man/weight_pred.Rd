@@ -16,7 +16,11 @@ weight_pred(ensemble.fit, coords, space.id, verbose = TRUE)
 \item{verbose}{Print MCMC output}
 }
 \value{
-A matrix containing weights
+A list with:
+\itemize{
+\item{\code{q}}{ : A matrix of imputed log-odds (weights) for each location, of dimension \code{(n.cell x n.iter)}.}
+\item{\code{locations}}{ : The \code{coords} and \code{space.id} used for prediction, in ordered form.}
+}
 }
 \description{
 This function generates weights using the output from the ensemble_spatial function

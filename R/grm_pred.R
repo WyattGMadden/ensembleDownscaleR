@@ -55,21 +55,20 @@ grm_pred <- function(
     }
     # L, M checks
     if (!is.null(L)) {
-        if (!is.matrix(L)) {
-            stop("'L' must be a matrix or NULL.")
+        if (!is.matrix(L) | !is.data.frame(L)) {
+            stop("'L' must be a matrix, data.frame, or NULL.")
         }
-        if (nrow(L) != length(X)) {
-            stop("Number of rows in 'L' must match length of 'X'.")
+        if (nrow(L) != length(Y)) {
+            stop("Number of rows in 'L' must match length of 'Y'.")
         }
     }
     if (!is.null(M)) {
-        if (!is.matrix(M)) {
-            stop("'M' must be a matrix or NULL.")
+        if (!is.matrix(M) | !is.data.frame(M)) {
+            stop("'M' must be a matrix, data.frame, or NULL.")
         }
-        if (nrow(M) != length(X)) {
-            stop("Number of rows in 'M' must match length of 'X'.")
+        if (nrow(M) != length(Y)) {
+            stop("Number of rows in 'M' must match length of 'Y'.")
         }
-    }
     # coords checks
     if (!is.matrix(coords)) {
         stop("'coords' must be a matrix.")
