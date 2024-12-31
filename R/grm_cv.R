@@ -114,7 +114,7 @@ grm_cv <- function(
     }
     
     # coords checks
-    if (!is.matrix(coords)) {
+    if (!is.matrix(coords) & !is.data.frame(coords)) {
         stop("'coords' must be a matrix.")
     }
     if (nrow(coords) != length(Y)) {

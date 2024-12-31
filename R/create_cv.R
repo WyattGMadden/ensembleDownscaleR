@@ -31,6 +31,10 @@ create_cv <- function(space.id,
     if (!is.numeric(num.folds) || num.folds < 2) {
         stop("num.folds must be an integer greater than 1")
     }
+    # coords checks
+    if (!is.matrix(coords) & !is.data.frame(coords)) {
+        stop("'coords' must be a matrix.")
+    }
     # buffer.size must be numeric, and one value
     if (!is.null(buffer.size) && (!is.numeric(buffer.size) || length(buffer.size) != 1)) {
         stop("buffer.size must be a numeric value")

@@ -47,8 +47,8 @@ weight_pred <- function(
         )
     }
 
-    # Check coords
-    if (!is.matrix(coords)) {
+    # coords checks
+    if (!is.matrix(coords) & !is.data.frame(coords)) {
         stop("'coords' must be a matrix.")
     }
     if (ncol(coords) != 2 || !all(colnames(coords) %in% c("x","y"))) {
