@@ -20,8 +20,8 @@ create_cv <- function(space.id,
                       buffer.size = NULL,
                       create.from = NULL) {
     # if not "ordinary", must supply coords
-    if (type != "ordinary" && is.null(coords)) {
-        stop("coords must be provided for spatial, spatial_clustered, or spatial_buffered cross validation")
+    if (type %in% c("spatial_clustered", "spatial_buffered") && is.null(coords)) {
+        stop("coords must be provided for spatial_clustered, or spatial_buffered cross validation")
     }
     # space.id and time.id must be same length
     if (length(space.id) != length(time.id)) {
