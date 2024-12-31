@@ -50,45 +50,155 @@
 #' 
 #' 
 #' @export
-grm <- function(Y, 
-               X, 
-               L = NULL, 
-               M = NULL, 
-               coords, 
-               space.id, 
-               time.id, 
-               spacetime.id,
-               include.additive.temporal.effect = T,
-               include.additive.spatial.effect = T,
-               include.multiplicative.temporal.effect = T,
-               include.multiplicative.spatial.effect = T,
-               num_neighbors = 10,
-               n.iter = 25000,
-               burn = 5000,
-               thin = 4,
-               covariance = "exponential",
-               covariance.kernal = NULL,
-               matern.nu = 1.5,
-               tau.alpha.a = 0.5,
-               tau.alpha.b = 0.005,
-               tau.beta.a = 0.5,
-               tau.beta.b = 0.005,
-               omega.a = 0.5,
-               omega.b = 0.005,
-               theta.alpha.tune = 0.2, 
-               theta.alpha.a = 5, 
-               theta.alpha.b = 0.05,
-               theta.alpha.init = 100,
-               theta.beta.tune = 0.2, 
-               theta.beta.a = 5, 
-               theta.beta.b = 0.05,
-               theta.beta.init = 100,
-               rho.alpha.init = 0.9999,
-               rho.beta.init = 0.9999,
-               sigma.a = 0.001, 
-               sigma.b = 0.001,
-               verbose = TRUE,
-               verbose.iter = 1000) {
+grm <- function(
+    Y, 
+    X, 
+    L = NULL, 
+    M = NULL, 
+    coords, 
+    space.id, 
+    time.id, 
+    spacetime.id,
+    include.additive.temporal.effect = T,
+    include.additive.spatial.effect = T,
+    include.multiplicative.temporal.effect = T,
+    include.multiplicative.spatial.effect = T,
+    num_neighbors = 10,
+    n.iter = 25000,
+    burn = 5000,
+    thin = 4,
+    covariance = "exponential",
+    covariance.kernal = NULL,
+    matern.nu = 1.5,
+    tau.alpha.a = 0.5,
+    tau.alpha.b = 0.005,
+    tau.beta.a = 0.5,
+    tau.beta.b = 0.005,
+    omega.a = 0.5,
+    omega.b = 0.005,
+    theta.alpha.tune = 0.2, 
+    theta.alpha.a = 5, 
+    theta.alpha.b = 0.05,
+    theta.alpha.init = 100,
+    theta.beta.tune = 0.2, 
+    theta.beta.a = 5, 
+    theta.beta.b = 0.05,
+    theta.beta.init = 100,
+    rho.alpha.init = 0.9999,
+    rho.beta.init = 0.9999,
+    sigma.a = 0.001, 
+    sigma.b = 0.001,
+    verbose = TRUE,
+    verbose.iter = 1000
+    ) {
+
+
+    ########################
+    ### Argument Checks ####
+    ########################
+
+    # Check basic types and lengths
+    if (!is.numeric(Y) || !is.vector(Y)) {
+        stop("'Y' must be a numeric vector.")
+    }
+    if (!is.numeric(X) || !is.vector(X)) {
+        stop("'X' must be a numeric vector.")
+    }
+    if (length(Y) != length(X)) {
+        stop("'Y' and 'X' must have the same length.")
+    }
+    if (!is.null(L)) {
+        if (!is.matrix(L)) {
+            stop("'L' must be a matrix or NULL.")
+        }
+        if (nrow(L) != length(Y)) {
+            stop("Number of rows in 'L' must match length of 'Y'.")
+        }
+    }
+    if (!is.null(M)) {
+        if (!is.matrix(M)) {
+            stop("'M' must be a matrix or NULL.")
+        }
+        if (nrow(M) != length(Y)) {
+            stop("Number of rows in 'M' must match length of 'Y'.")
+        }
+    }
+    # coords checks
+    if (!is.matrix(coords)) {
+        stop("'coords' must be a matrix.")
+    }
+    if (nrow(coords) != length(Y)) {
+        stop("Number of rows in 'coords' must match length of 'Y'.")
+    }
+    if (!all(colnames(coords) == c("x", "y"))) {
+        stop("'coords' must have colnames 'x' and 'y'.")
+    }
+    # space.id / time.id / spacetime.id checks
+    if (length(space.id) != length(Y)) {
+        stop("'space.id' must have the same length as 'Y'.")
+    }
+    if (length(time.id) != length(Y)) {
+        stop("'time.id' must have the same length as 'Y'.")
+    }
+    if (length(spacetime.id) != length(Y)) {
+        stop("'spacetime.id' must have the same length as 'Y'. If you do not wish to include spacetime effects, input a vector of 1's with the same length as space.id and time.id.")
+    }
+    # Boolean checks
+    if (!is.logical(include.additive.temporal.effect) ||
+        !is.logical(include.additive.spatial.effect) ||
+        !is.logical(include.multiplicative.temporal.effect) ||
+        !is.logical(include.multiplicative.spatial.effect)) {
+        stop("'include.*.effect' arguments must be TRUE/FALSE.")
+    }
+    # numeric / integer checks
+    if (!is.numeric(num_neighbors) || length(num_neighbors) != 1 || num_neighbors < 1) {
+        stop("'num_neighbors' must be a positive numeric scalar.")
+    }
+    if (!is.numeric(n.iter) || n.iter <= 0) {
+        stop("'n.iter' must be a positive numeric scalar.")
+    }
+    if (!is.numeric(burn) || burn < 0) {
+        stop("'burn' must be a nonnegative numeric scalar.")
+    }
+    if (!is.numeric(thin) || thin < 1) {
+        stop("'thin' must be a positive numeric scalar.")
+    }
+    if (!is.character(covariance) || !(covariance %in% c("exponential", "matern", "custom"))) {
+        stop("'covariance' must be one of 'exponential', 'matern', or 'custom'.")
+    }
+    if (covariance == "custom" && !is.function(covariance.kernal)) {
+        stop("If 'covariance' is 'custom', 'covariance.kernal' must be a valid function.")
+    }
+    if (covariance == "matern" && !(matern.nu %in% c(0.5, 1.5, 2.5))) {
+        stop("'matern.nu' must be 0.5, 1.5, or 2.5 when 'covariance' is 'matern'.")
+    }
+    # prior hyperparameters (non-exhaustive)
+    if (!is.numeric(sigma.a) || !is.numeric(sigma.b) || sigma.a <= 0 || sigma.b <= 0) {
+        stop("'sigma.a' and 'sigma.b' must be positive numeric values.")
+    }
+    if (!is.numeric(theta.alpha.a) || theta.alpha.a <= 0) {
+        stop("'theta.alpha.a' must be positive.")
+    }
+    if (!is.numeric(theta.alpha.b) || theta.alpha.b <= 0) {
+        stop("'theta.alpha.b' must be positive.")
+    }
+    if (!is.numeric(theta.beta.a) || theta.beta.a <= 0) {
+        stop("'theta.beta.a' must be positive.")
+    }
+    if (!is.numeric(theta.beta.b) || theta.beta.b <= 0) {
+        stop("'theta.beta.b' must be positive.")
+    }
+    if (!is.numeric(verbose.iter) || verbose.iter < 1) {
+        stop("'verbose.iter' must be a positive integer.")
+    }
+    # checks for initial values
+    if (!is.numeric(theta.alpha.init) || !is.numeric(theta.beta.init)) {
+        stop("Initial values for theta.alpha.init and theta.beta.init must be numeric.")
+    }
+    if (!is.numeric(rho.alpha.init) || !is.numeric(rho.beta.init)) {
+        stop("Initial values for rho.alpha.init and rho.beta.init must be numeric.")
+    }
+
  
 
     ###############################

@@ -9,7 +9,11 @@
 #' @param coords Coordinate matrix for first variable predictions
 #' @param space.id Space id for first primary variable predictions
 #'
-#' @return A matrix containing weights
+#' @return A list with:
+#' \itemize{
+#'   \item{\code{q}}{ : A matrix of imputed log-odds (weights) for each location, of dimension \code{(n.cell x n.iter)}.}
+#'   \item{\code{locations}}{ : The \code{coords} and \code{space.id} used for prediction, in ordered form.}
+#' }
 #'
 #' @examples
 #' # weight_preds()
@@ -17,10 +21,44 @@
 #' 
 #' @export
 
-weight_pred <- function(ensemble.fit, 
-                       coords,
-                       space.id,
-                       verbose = TRUE) {
+weight_pred <- function(
+    ensemble.fit, 
+    coords,
+    space.id,
+    verbose = TRUE
+    ) {
+
+    ###################################
+    ###         ARG CHECKS          ###
+    ###################################
+
+    # Single combined check that ensures 'ensemble.fit' is from ensemble_spatial()
+    needed_in_ensemble <- c("q", "other", "locations")
+    if (!is.list(ensemble.fit) ||
+        !all(needed_in_ensemble %in% names(ensemble.fit)) ||
+        !is.data.frame(ensemble.fit$q) ||
+        !is.data.frame(ensemble.fit$other) ||
+        !is.data.frame(ensemble.fit$locations)) {
+        stop(
+            "'ensemble.fit' must be a list output from ensemble_spatial(), containing at least:\n",
+            " - 'q': a data frame of posterior samples for log-odds q,\n",
+            " - 'other': a data frame with posterior samples for tau2, theta, dev, etc.,\n",
+            " - 'locations': a data frame of the reference x,y coordinates."
+        )
+    }
+
+    # Check coords
+    if (!is.matrix(coords)) {
+        stop("'coords' must be a matrix.")
+    }
+    if (ncol(coords) != 2 || !all(colnames(coords) %in% c("x","y"))) {
+        stop("'coords' must have two columns named 'x' and 'y'.")
+    }
+
+    # Check space.id
+    if (length(space.id) != nrow(coords)) {
+        stop("'space.id' length must match the number of rows in 'coords'.")
+    }
 
     q <- ensemble.fit$q
     theta <- ensemble.fit$other$theta

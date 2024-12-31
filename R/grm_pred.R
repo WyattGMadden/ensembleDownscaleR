@@ -19,21 +19,95 @@
 #' 
 #' @export
 
-grm_pred <- function(grm.fit,
-                    X, 
-                    L = NULL, 
-                    M = NULL, 
-                    coords,
-                    space.id, 
-                    time.id, 
-                    spacetime.id, 
-                    include.additive.spatial.effect = T,
-                    include.multiplicative.spatial.effect = T,
-                    n.iter = 500,
-                    verbose = TRUE,
-                    in.sample = FALSE) {
+grm_pred <- function(
+    grm.fit,
+    X, 
+    L = NULL, 
+    M = NULL, 
+    coords,
+    space.id, 
+    time.id, 
+    spacetime.id, 
+    include.additive.spatial.effect = T,
+    include.multiplicative.spatial.effect = T,
+    n.iter = 500,
+    verbose = TRUE,
+    in.sample = FALSE
+    ) {
 
-    # assertions
+    ###################################
+    ###         ARG CHECKS          ###
+    ###################################
+    
+    # Check if grm.fit is from grm()
+    needed_in_grmfit <- c("others", "alpha.space", "beta.space", 
+                          "alpha.time", "standardize.param", 
+                          "locations", "cov_kern")
+    if (!is.list(grm.fit) ||
+        !all(needed_in_grmfit %in% names(grm.fit))) {
+        stop("'grm.fit' must be a list output from grm(), containing at least the elements:",
+             " 'others', 'alpha.space', 'beta.space', 'alpha.time', 'standardize.param', 'locations', 'cov_kern'.")
+    }
+
+    # X check
+    if (!is.numeric(X) || !is.vector(X)) {
+        stop("'X' must be a numeric vector.")
+    }
+    # L, M checks
+    if (!is.null(L)) {
+        if (!is.matrix(L)) {
+            stop("'L' must be a matrix or NULL.")
+        }
+        if (nrow(L) != length(X)) {
+            stop("Number of rows in 'L' must match length of 'X'.")
+        }
+    }
+    if (!is.null(M)) {
+        if (!is.matrix(M)) {
+            stop("'M' must be a matrix or NULL.")
+        }
+        if (nrow(M) != length(X)) {
+            stop("Number of rows in 'M' must match length of 'X'.")
+        }
+    }
+    # coords checks
+    if (!is.matrix(coords)) {
+        stop("'coords' must be a matrix.")
+    }
+    if (nrow(coords) != length(X)) {
+        stop("Number of rows in 'coords' must match length of 'X'.")
+    }
+    if (!all(colnames(coords) == c("x", "y"))) {
+        stop("'coords' must have colnames 'x' and 'y'.")
+    }
+    # space.id/time.id/spacetime.id checks
+    if (length(space.id) != length(X)) {
+        stop("'space.id' must have the same length as 'X'.")
+    }
+    if (length(time.id) != length(X)) {
+        stop("'time.id' must have the same length as 'X'.")
+    }
+    if (length(spacetime.id) != length(X)) {
+        stop("'spacetime.id' must have the same length as 'X'.")
+    }
+
+    # Boolean checks for includes
+    if (!is.logical(include.additive.spatial.effect) || !is.logical(include.multiplicative.spatial.effect)) {
+        stop("'include.additive.spatial.effect' and 'include.multiplicative.spatial.effect' must be TRUE/FALSE.")
+    }
+
+    # n.iter checks
+    if (!is.numeric(n.iter) || n.iter < 1) {
+        stop("'n.iter' must be a positive numeric scalar.")
+    }
+    # in.sample checks
+    if (!is.logical(in.sample) || length(in.sample) != 1) {
+        stop("'in.sample' must be a single TRUE/FALSE value.")
+    }
+    # check if n.iter <= rows in grm.fit$others
+    if (!in.sample && nrow(grm.fit$others) < n.iter) {
+        stop("'n.iter' must be less than or equal to the number of MCMC samples in 'grm.fit$others'.")
+    }
     if (!in.sample & (nrow(grm.fit$others) < n.iter)) {
         stop("n.iter must be less than or equal to the number of iterations in the grm.fit object")
     }

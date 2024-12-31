@@ -14,9 +14,38 @@
 #' 
 #' @export
 
-gap_fill <- function(grm.pred.1,
-                     grm.pred.2,
-                     weights) {
+gap_fill <- function(
+    grm.pred.1,
+    grm.pred.2,
+    weights
+    ) {
+
+
+    ###################################
+    ###         ARG CHECKS          ###
+    ###################################
+
+    # Single combined check that each of grm.pred.* is from grm_pred()
+    #   i.e., must be a data frame with columns: time.id, space.id, spacetime.id, estimate, sd.
+    needed_cols <- c("time.id", "space.id", "spacetime.id", "estimate", "sd")
+    if (!all(sapply(list(grm.pred.1, grm.pred.2), function(df) {
+        is.data.frame(df) && all(needed_cols %in% names(df))
+    }))) {
+        stop(
+            "Both 'grm.pred.1' and 'grm.pred.2' must be data frames from grm_pred(),\n",
+            "containing at least columns: 'time.id', 'space.id', 'spacetime.id', 'estimate', 'sd'."
+        )
+    }
+
+    # Check 'weights' is from weight_pred() or ensemble_spatial()
+    # Minimal check: must be a list with an element named 'q'.
+    if (!is.list(weights) || !"q" %in% names(weights)) {
+        stop("'weights' must be a list output from weight_pred() or ensemble_spatial(), containing an element named 'q'.")
+    }
+    if (!is.matrix(weights$q) && !is.data.frame(weights$q)) {
+        stop("'weights$q' must be a matrix or data frame of posterior samples (log-odds).")
+    }
+
 
 
     space.id <- grm.pred.1$space.id

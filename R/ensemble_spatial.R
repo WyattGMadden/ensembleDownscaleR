@@ -12,7 +12,13 @@
 #' @param theta.a First theta prior hyperparameter
 #' @param theta.b Second theta prior hyperparameter
 #'
-#' @return A data frame containing cross validation predictions
+#' @return A list containing:
+#' \itemize{
+#'  \item{\code{q}}{ : Posterior samples for the log-odds q (spatially varying), plus space IDs.}
+#'  \item{\code{other}}{ : A data frame with posterior samples of \code{tau2}, \code{theta}, and \code{dev} (DIC-like measure).}
+#'  \item{\code{theta.acc}}{ : Acceptance rate for the \code{theta} parameter.}
+#'  \item{\code{locations}}{ : The ordered locations used in building the spatial distance matrix.}
+#' }
 #'
 #' @examples
 #' # ensemble_spatial()
@@ -21,17 +27,62 @@
 #' @export
 
 
-ensemble_spatial <- function(grm.fit.cv.1,
-                             grm.fit.cv.2,
-                             n.iter = 25000, 
-                             burn = 5000, 
-                             thin = 4,
-                             tau.a = 0.001, 
-                             tau.b = 0.001, 
-                             theta.tune = 0.2, 
-                             theta.a = 5, 
-                             theta.b = 0.05) {
+ensemble_spatial <- function(
+    grm.fit.cv.1,
+    grm.fit.cv.2,
+    n.iter = 25000, 
+    burn = 5000, 
+    thin = 4,
+    tau.a = 0.001, 
+    tau.b = 0.001, 
+    theta.tune = 0.2, 
+    theta.a = 5, 
+    theta.b = 0.05) {
   
+    ###################################
+    ###         ARG CHECKS          ###
+    ###################################
+
+    # Combined check that both grm.fit.cv.1 and grm.fit.cv.2 are data frames 
+    # with the columns expected from grm_cv().
+    needed_cols <- c("time.id", "space.id", "obs", "estimate", "sd", "x", "y")
+    if (!all(sapply(list(grm.fit.cv.1, grm.fit.cv.2), function(df) {
+        is.data.frame(df) && all(needed_cols %in% names(df))
+    }))) {
+        stop(
+            "Both 'grm.fit.cv.1' and 'grm.fit.cv.2' must be data frames from grm_cv(), ",
+            "i.e., contain columns 'time.id', 'space.id', 'obs', 'estimate', 'sd', 'x', and 'y'."
+        )
+    }
+
+    # Check MCMC argument types (n.iter, burn, thin)
+    if (!is.numeric(n.iter) || length(n.iter) != 1 || n.iter <= 0) {
+        stop("'n.iter' must be a positive numeric scalar.")
+    }
+    if (!is.numeric(burn) || length(burn) != 1 || burn < 0) {
+        stop("'burn' must be a nonnegative numeric scalar.")
+    }
+    if (!is.numeric(thin) || length(thin) != 1 || thin < 1) {
+        stop("'thin' must be a positive numeric scalar.")
+    }
+
+    # Check tau, theta hyperparameters
+    if (!is.numeric(tau.a) || tau.a <= 0) {
+        stop("'tau.a' must be positive.")
+    }
+    if (!is.numeric(tau.b) || tau.b <= 0) {
+        stop("'tau.b' must be positive.")
+    }
+    if (!is.numeric(theta.tune) || theta.tune <= 0) {
+        stop("'theta.tune' must be a positive numeric scalar.")
+    }
+    if (!is.numeric(theta.a) || theta.a <= 0) {
+        stop("'theta.a' must be positive.")
+    }
+    if (!is.numeric(theta.b) || theta.b <= 0) {
+        stop("'theta.b' must be positive.")
+    }
+
 
     space.id <- grm.fit.cv.1$space.id
     coords.Y.1 <- grm.fit.cv.1[, c("x", "y")]

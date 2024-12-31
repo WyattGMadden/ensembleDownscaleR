@@ -79,11 +79,11 @@ create_cv <- function(space.id,
 #' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 #'
 create_cv_original <- function(space.id,
-                      time.id,
-                      num.folds = 10,
-                      type = "spatial",
-                      coords = NULL,
-                      buffer.size = NULL) {
+                               time.id,
+                               num.folds = 10,
+                               type = "spatial",
+                               coords = NULL,
+                               buffer.size = NULL) {
 
     #remove first/last time observations
     time_obs_1 <- sum(time.id == 1)
