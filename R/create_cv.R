@@ -60,6 +60,12 @@ create_cv <- function(space.id,
         if (!all(c("cv.id", "num.folds", "type", "drop.matrix", "time.id", "space.id", "coords", "buffer.size") %in% names(create.from))) {
             stop("create.from must be a cross-validation object created by create_cv()")
         }
+        if (!type %in% c("spatial", "spatial_clustered", "spatial_buffered")) {
+            stop("Can only use create.from for spatial-type CV (spatial, spatial_clustered, spatial_buffered).")
+        }
+        if (create.from == "spatial_buffered" & is.null(coords)) {
+          stop("Must provide 'coords' for spatial_buffered re-creation.")
+        }
 
 
         cv.output <- create_cv_from_previous(
@@ -229,105 +235,74 @@ create_cv_from_previous <- function(previous.cv.object,
                                     space.id,
                                     time.id,
                                     coords = NULL) {
-
   type <- previous.cv.object$type
   buffer.size <- previous.cv.object$buffer.size
   num.folds <- previous.cv.object$num.folds
   old_cv_id <- previous.cv.object$cv.id
-  old_dropmat <- previous.cv.object$drop.matrix  # may be NULL if not "spatial_buffered"
+  old_dropmat <- previous.cv.object$drop.matrix
+
 
   df_old <- data.frame(
     space_id = previous.cv.object$space.id,
     time_id = previous.cv.object$time.id,
-    cv_id = previous.cv.object$cv.id
+    cv_id = old_cv_id
   )
   df_new <- data.frame(
     space_id = space.id,
-    time_id  = time.id
+    time_id = time.id
   )
 
-  # Merge old assignments into new
+  df_old <- stats::aggregate(
+    cv_id ~ space_id + time_id, data = df_old,
+    FUN = function(x) x[1]
+  )
+
   df_new <- merge(
     df_new,
     df_old,
-    by    = c("space_id","time_id"),
+    by = c("space_id", "time_id"),
     all.x = TRUE,
-    sort  = FALSE
+    sort = FALSE
   )
-  # df_new now has columns: space_id, time_id, cv_id (NA if new combo)
 
-  # Only "ordinary" depends on both time and space.
-  # For new combos under "ordinary", replicate the original logic:
-  #   - group by space_id
-  #   - if # combos < num.folds => cv_id=0
-  #   - else => random shuffle of folds 1..num.folds
-  if (type == "ordinary") {
-    new_rows <- which(is.na(df_new$cv_id))
-    if (length(new_rows) > 0) {
-      site_groups <- split(new_rows, df_new$space_id[new_rows])
-      for (s in names(site_groups)) {
-        idx   <- site_groups[[s]]
-        n_obs <- length(idx)
-        if (n_obs < num.folds) {
-          df_new$cv_id[idx] <- 0
-        } else {
-          folds_seq         <- (1:num.folds)[(1:n_obs) %% num.folds + 1]
-          folds_seq         <- sample(folds_seq, replace = FALSE)
-          df_new$cv_id[idx] <- folds_seq
-        }
-      }
-    }
-  } else {
-    # For "spatial", "spatial_clustered", "spatial_buffered", etc.,
-    # time does not affect assignment. All space IDs appear in old + new,
-    # so new combos simply inherit the old space's fold if it exists,
-    # which was already merged in df_new. (No new site IDs.)
-  }
-
-  # Zero out min/max time
-  all_time_ids  <- df_new$time_id
-  idx_min_time  <- which(all_time_ids == 1)
-  idx_max_time  <- which(all_time_ids == max(all_time_ids))
+  idx_min_time <- which(df_new$time_id == min(df_new$time_id))
+  idx_max_time <- which(df_new$time_id == max(df_new$time_id))
   df_new$cv_id[idx_min_time] <- 0
   df_new$cv_id[idx_max_time] <- 0
 
-  # If "spatial_buffered", recalc drop matrix for the new data
   new_dropmat <- NULL
   if (type == "spatial_buffered") {
-    # Middle rows only
     rows_mid <- setdiff(seq_len(nrow(df_new)), c(idx_min_time, idx_max_time))
     if (length(rows_mid) == 0) {
-      # No middle rows
       new_dropmat <- matrix(0, nrow = nrow(df_new), ncol = num.folds)
     } else {
-      # Distances among unique space IDs in the middle chunk
-      coords_mid   <- coords[rows_mid, , drop=FALSE]
-      space_mid    <- df_new$space_id[rows_mid]
-      cv_mid       <- df_new$cv_id[rows_mid]
-      locs <- unique(cbind(space_mid, coords_mid, cv_mid))
-      colnames(locs) <- c("space_id","x","y","cv_id_mid")
-      locs <- locs[order(locs[,"space_id"]), ]
+      coords_mid <- coords[rows_mid, , drop = FALSE]
+      space_mid <- df_new$space_id[rows_mid]
+      cv_mid <- df_new$cv_id[rows_mid]
 
-      dist_mat       <- as.matrix(stats::dist(locs[,c("x","y")]))
-      new_dropmat_mid<- matrix(0, nrow = nrow(locs), ncol = num.folds)
+      locs <- data.frame(space_mid, coords_mid, cv_mid)
+      colnames(locs) <- c("space_id", "x", "y", "cv_id_mid")
+      locs <- locs[order(locs$space_id), ]
 
+      dist_mat <- as.matrix(stats::dist(locs[, c("x", "y")]))
+      new_dropmat_mid <- matrix(0, nrow = nrow(locs), ncol = num.folds)
       for (fold_i in seq_len(num.folds)) {
-        fold_sites     <- locs[locs[,"cv_id_mid"] == fold_i, "space_id"]
-        non_fold_sites <- locs[locs[,"cv_id_mid"] != fold_i, "space_id"]
-        if (length(fold_sites)==0 || length(non_fold_sites)==0) next
-        dist_cv_ncv    <- dist_mat[fold_sites, non_fold_sites, drop=FALSE]
-        spat_id_to_drop<- non_fold_sites[
+        fold_sites <- locs$space_id[locs$cv_id_mid == fold_i]
+        non_fold_sites <- locs$space_id[locs$cv_id_mid != fold_i]
+        if (length(fold_sites) == 0 || length(non_fold_sites) == 0) next
+
+        dist_cv_ncv <- dist_mat[fold_sites, non_fold_sites, drop = FALSE]
+        spat_id_to_drop <- non_fold_sites[
           apply(dist_cv_ncv, 2, function(x) sum(x < buffer.size) > 0)
         ]
-        new_dropmat_mid[, fold_i] <- locs[,"space_id"] %in% spat_id_to_drop
+        new_dropmat_mid[, fold_i] <- locs$space_id %in% spat_id_to_drop
       }
 
-      # Expand to full data
       new_dropmat <- matrix(0, nrow = nrow(df_new), ncol = num.folds)
-      site_map <- match(space_mid, locs[,"space_id"])
-      for (i in seq_along(rows_mid)) {
-        row_idx  <- rows_mid[i]
-        site_idx <- site_map[i]
+      site_map <- match(space_mid, locs$space_id)
+      for (k in seq_along(rows_mid)) {
+        row_idx <- rows_mid[k]
+        site_idx <- site_map[k]
         new_dropmat[row_idx, ] <- new_dropmat_mid[site_idx, ]
       }
     }
