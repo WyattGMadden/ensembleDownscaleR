@@ -83,7 +83,8 @@ modis_fit <- grm(
     coords = modis_aqs_matched[, c("x", "y")],
     space.id = modis_aqs_matched$space_id,
     time.id = modis_aqs_matched$time_id,
-    spacetime.id = modis_aqs_matched$spacetime_id
+    spacetime.id = modis_aqs_matched$spacetime_id,
+    verbose.iter = 10
 )
 
 ```
