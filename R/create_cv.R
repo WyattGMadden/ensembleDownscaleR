@@ -12,8 +12,9 @@
 #' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 #'
 #' @export
-create_cv <- function(space.id,
-                      time.id,
+create_cv <- function(time.id,
+                      space.id,
+                      spacetime.id,
                       num.folds = 10L,
                       type = "ordinary",
                       coords = NULL,
@@ -44,8 +45,9 @@ create_cv <- function(space.id,
 
     if (is.null(create.from)) {
         cv.output <- create_cv_original(
-            space.id = space.id,
             time.id = time.id,
+            space.id = space.id,
+            spacetime.id = spacetime.id,
             num.folds = num.folds,
             type = type,
             coords = coords,
@@ -70,8 +72,9 @@ create_cv <- function(space.id,
 
         cv.output <- create_cv_from_previous(
             previous.cv.object = create.from,
-            space.id = space.id,
             time.id = time.id,
+            space.id = space.id,
+            spacetime.id = spacetime.id,
             coords = coords
         )
     }
@@ -90,8 +93,9 @@ create_cv <- function(space.id,
 #'
 #' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 #'
-create_cv_original <- function(space.id,
-                               time.id,
+create_cv_original <- function(time.id,
+                               space.id,
+                               spacetime.id,
                                num.folds = 10,
                                type = "spatial",
                                coords = NULL,
@@ -102,6 +106,7 @@ create_cv_original <- function(space.id,
     time_obs_max <- sum(time.id == max(time.id))
 
     space_id_cv <- space.id[(time_obs_1 + 1):(length(space.id) - time_obs_max)]
+    spacetime_id_cv <- spacetime.id[(time_obs_1 + 1):(length(spacetime.id) - time_obs_max)]
     cv_id <- rep(NA, length(space.id) - time_obs_1 - time_obs_max)
 
     #later overwritten if type = "spatial_buffered"
@@ -128,18 +133,20 @@ create_cv_original <- function(space.id,
 
     } else if (type == "ordinary") {
 
-        for (i in 1:max(space_id_cv)) {
+        space_spacetime_key <- paste(space.id, spacetime.id)
+        space_spacetime_id <- 1:length(space_spacetime_key)
 
-            # make sure no spatial location is not in some but not all folds
-            if (sum(space_id_cv == i) < num.folds) {
+        for (i in space_spacetime_key) {
 
-                cv_id[space_id_cv == i] <- rep(0, sum(space_id_cv == i))
+            # make sure no space/spacetime is not in some but not all folds
+            if (sum(space_spacetime_key == i) < num.folds) {
+
+                cv_id[space_spacetime_key == i] <- rep(0, sum(space_spacetime_key == i))
 
             } else {
 
-
                 #number of observations in site i for cv
-                obs_for_site_i <- sum(space_id_cv == i) 
+                obs_for_site_i <- sum(space_spacetime_key == i) 
 
                 #unshuffled cv id's with (almost) equal number of observations in each fold
                 cv_id_i <- (1:num.folds)[(1:obs_for_site_i) %% num.folds + 1]
@@ -147,7 +154,7 @@ create_cv_original <- function(space.id,
                 #shuffle cv id's
                 cv_id_i <- sample(cv_id_i, replace = F)
             
-                cv_id[space_id_cv == i] <- cv_id_i
+                cv_id[space_spacetime_key == i] <- cv_id_i
             }
         
         }
@@ -232,8 +239,9 @@ create_cv_original <- function(space.id,
 #'
 #' @return A named list containing a vector of cross validation ID's, a matrix of which observations to drop for each fold if the cv type is "spatial_buffered", and inputted objects.   
 create_cv_from_previous <- function(previous.cv.object,
-                                    space.id,
                                     time.id,
+                                    space.id,
+                                    spacetime.id,
                                     coords) {
   type <- previous.cv.object$type
   buffer.size <- previous.cv.object$buffer.size
