@@ -5,8 +5,9 @@
 \title{Create Cross Validate ID's}
 \usage{
 create_cv_original(
-  space.id,
   time.id,
+  space.id,
+  spacetime.id,
   num.folds = 10,
   type = "spatial",
   coords = NULL,
@@ -14,9 +15,11 @@ create_cv_original(
 )
 }
 \arguments{
+\item{time.id}{Temporal location ID vector (n)}
+
 \item{space.id}{Spatial location ID vector (n)}
 
-\item{time.id}{Temporal location ID vector (n)}
+\item{spacetime.id}{ID vector of time points where spatial trends vary (n)}
 
 \item{num.folds}{Number of folds used in the cross validation process (default = 10)}
 

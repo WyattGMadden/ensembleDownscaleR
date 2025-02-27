@@ -66,7 +66,8 @@ modis_fit <- grm(
     coords = modis_aqs_matched[, c("x", "y")],
     space.id = modis_aqs_matched$space_id,
     time.id = modis_aqs_matched$time_id,
-    spacetime.id = modis_aqs_matched$spacetime_id
+    spacetime.id = modis_aqs_matched$spacetime_id,
+    verbose.iter = 10
 )
 ```
 
@@ -114,8 +115,9 @@ modis_pred <- grm_pred(
 ``` r
 
 cv_id_cmaq_ord <- create_cv(
-    space.id = cmaq_aqs_matched$space_id,
     time.id = cmaq_aqs_matched$time_id, 
+    space.id = cmaq_aqs_matched$space_id,
+    spacetime.id = cmaq_aqs_matched$spacetime_id,
     type = "ordinary"
 )
 
@@ -135,13 +137,12 @@ cmaq_fit_cv <- grm_cv(
     time.id = cmaq_aqs_matched$time_id,
     spacetime.id = cmaq_aqs_matched$spacetime_id
 )
-
 cv_id_modis_ord <- create_cv(
-    create.from = cv_id_cmaq_ord,
-    space.id = modis_aqs_matched$space_id,
     time.id = modis_aqs_matched$time_id,
+    space.id = modis_aqs_matched$space_id,
+    spacetime.id = modis_aqs_matched$spacetime_id,
+    type = "ordinary"
 )
-
 modis_fit_cv <- grm_cv(
     Y = modis_aqs_matched$pm25,
     X = modis_aqs_matched$aod,
