@@ -134,7 +134,7 @@ create_cv_original <- function(time.id,
     } else if (type == "ordinary") {
 
         space_spacetime_key <- paste(space.id, spacetime.id)
-        space_spacetime_id <- 1:length(space_spacetime_key)
+        space_spacetime_id <- 1:length(unique(space_spacetime_key))
 
         for (i in space_spacetime_key) {
 
