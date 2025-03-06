@@ -134,9 +134,9 @@ create_cv_original <- function(time.id,
     } else if (type == "ordinary") {
 
         space_spacetime_key <- paste(space.id, spacetime.id)
-        space_spacetime_id <- 1:length(unique(space_spacetime_key))
+        space_spacetime_id <- unique(space_spacetime_key)
 
-        for (i in space_spacetime_key) {
+        for (i in space_spacetime_id) {
 
             # make sure no space/spacetime is not in some but not all folds
             if (sum(space_spacetime_key == i) < num.folds) {
