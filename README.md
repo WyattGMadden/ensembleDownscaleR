@@ -18,7 +18,13 @@ You can install the development version of ensembleDownscaleR like so:
 remotes::install_github("WyattGMadden/ensembleDownscaleR")
 ```
 
-## Example
+## Tutorial
+
+Please see a full code tutorial at [this
+repo](https://github.com/WyattGMadden/ensembleDownscaleR_tutorial) or
+continue for a minimal example.
+
+## Minimal Example
 
 ``` r
 library(ensembleDownscaleR)
