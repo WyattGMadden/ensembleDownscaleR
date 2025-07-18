@@ -401,8 +401,16 @@ grm <- function(
         beta0 <- stats::coef(fit)[2]
         gamma <- stats::coef(fit)[3:(ncol(L) + 2)]
         delta <- stats::coef(fit)[(3 + ncol(L)):length(stats::coef(fit))]
-        lambda_gamma <- stats::var(gamma)
-        lambda_delta <- stats::var(delta)
+        if (length(delta) > 1) {
+            lambda_delta <- stats::var(delta)
+        } else {
+            lambda_delta <- 1
+        }
+        if (length(gamma) > 1) {
+            lambda_gamma <- stats::var(gamma)
+        } else {
+            lambda_gamma <- 1
+        }
         mu <- alpha0 + beta0 * X + L %*% gamma + M %*% delta
     } 
     
@@ -411,7 +419,11 @@ grm <- function(
         alpha0 <- stats::coef(fit)[1]
         beta0 <- stats::coef(fit)[2]
         delta <- stats::coef(fit)[3:length(stats::coef(fit))]
-        lambda_delta <- stats::var(delta)
+        if (length(delta) > 1) {
+            lambda_delta <- stats::var(delta)
+        } else {
+            lambda_delta <- 1
+        }
         mu <- alpha0 + beta0 * X + M %*% delta
     }
     
@@ -420,7 +432,11 @@ grm <- function(
         alpha0 <- stats::coef(fit)[1]
         beta0 <- stats::coef(fit)[2]
         gamma <- stats::coef(fit)[3:(ncol(L)+2)]
-        lambda_gamma <- stats::var(gamma)
+        if (length(gamma) > 1) {
+            lambda_gamma <- stats::var(gamma)
+        } else {
+            lambda_gamma <- 1
+        }
         mu <- alpha0 + beta0 * X + L %*% gamma 
     }
     
