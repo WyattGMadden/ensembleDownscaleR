@@ -79,7 +79,6 @@ modis_fit <- grm(
     M = modis_aqs_matched[, c("tmp", "wind", "cmaq", "tempaod", 
                               "windaod", "elevationaod")],
     n.iter = 50,
-    num_neighbors = 6,
     burn = 10,
     thin = 4,
     coords = modis_aqs_matched[, c("x", "y")],
@@ -162,12 +161,14 @@ cmaq_fit_cv <- grm_cv(
     time.id = cmaq_aqs_matched$time_id,
     spacetime.id = cmaq_aqs_matched$spacetime_id
 )
+
 cv_id_modis_ord <- create_cv(
     time.id = modis_aqs_matched$time_id,
     space.id = modis_aqs_matched$space_id,
     spacetime.id = modis_aqs_matched$spacetime_id,
     type = "ordinary"
 )
+
 modis_fit_cv <- grm_cv(
     Y = modis_aqs_matched$pm25,
     X = modis_aqs_matched$aod,

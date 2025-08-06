@@ -19,7 +19,7 @@ grm_cv <- function(
     cv.object,
     L = NULL, 
     M = NULL, 
-    coords,
+    coords, 
     space.id, 
     time.id, 
     spacetime.id,
@@ -27,6 +27,11 @@ grm_cv <- function(
     include.additive.spatial.effect = T,
     include.multiplicative.temporal.effect = T,
     include.multiplicative.spatial.effect = T,
+    nngp = F,
+    number.neighbors = 10,
+    discrete.theta.alpha.values = NULL,
+    discrete.theta.beta.values = NULL,
+    discrete.theta.gibbs = T,
     n.iter = 25000,
     burn = 5000,
     thin = 4,
@@ -35,8 +40,10 @@ grm_cv <- function(
     matern.nu = 1.5,
     tau.alpha.a = 0.5,
     tau.alpha.b = 0.005,
+    tau.alpha.tune = 0.2, 
     tau.beta.a = 0.5,
     tau.beta.b = 0.005,
+    tau.beta.tune = 0.2, 
     omega.a = 0.5,
     omega.b = 0.005,
     theta.alpha.tune = 0.2, 
@@ -51,6 +58,7 @@ grm_cv <- function(
     rho.beta.init = 0.9999,
     sigma.a = 0.001, 
     sigma.b = 0.001,
+    sigma.fix.iter.num = 0,
     verbose = TRUE,
     verbose.iter = 1000
     ) {
@@ -112,7 +120,6 @@ grm_cv <- function(
             stop("Number of rows in 'M' must match length of 'Y'.")
         }
     }
-    
     # coords checks
     if (!is.matrix(coords) & !is.data.frame(coords)) {
         stop("'coords' must be a matrix.")
@@ -123,7 +130,6 @@ grm_cv <- function(
     if (!all(colnames(coords) == c("x", "y"))) {
         stop("'coords' must have colnames 'x' and 'y'.")
     }
-    
     # space.id / time.id / spacetime.id checks
     if (length(space.id) != length(Y)) {
         stop("'space.id' must have the same length as 'Y'.")
@@ -134,16 +140,17 @@ grm_cv <- function(
     if (length(spacetime.id) != length(Y)) {
         stop("'spacetime.id' must have the same length as 'Y'. If you do not wish to include spacetime effects, input a vector of 1's with the same length as space.id and time.id.")
     }
-    
     # Boolean checks
     if (!is.logical(include.additive.temporal.effect) ||
         !is.logical(include.additive.spatial.effect) ||
         !is.logical(include.multiplicative.temporal.effect) ||
         !is.logical(include.multiplicative.spatial.effect)) {
-        stop("All 'include.*.effect' arguments must be TRUE/FALSE.")
+        stop("'include.*.effect' arguments must be TRUE/FALSE.")
     }
-    
     # numeric / integer checks
+    if (!is.numeric(number.neighbors) || length(number.neighbors) != 1 || number.neighbors < 1) {
+        stop("'number.neighbors' must be a positive numeric scalar.")
+    }
     if (!is.numeric(n.iter) || n.iter <= 0) {
         stop("'n.iter' must be a positive numeric scalar.")
     }
@@ -162,33 +169,75 @@ grm_cv <- function(
     if (covariance == "matern" && !(matern.nu %in% c(0.5, 1.5, 2.5))) {
         stop("'matern.nu' must be 0.5, 1.5, or 2.5 when 'covariance' is 'matern'.")
     }
-    
-    # prior hyperparameters (partial checks)
+    # prior hyperparameters 
     if (!is.numeric(sigma.a) || !is.numeric(sigma.b) || sigma.a <= 0 || sigma.b <= 0) {
         stop("'sigma.a' and 'sigma.b' must be positive numeric values.")
     }
+    #sigma.fix.iter.num must be nonnegative integer
+    if (!is.numeric(sigma.fix.iter.num) || sigma.fix.iter.num < 0 || sigma.fix.iter.num != round(sigma.fix.iter.num)) {
+        stop("'sigma.fix.iter.num' must be a nonnegative integer.")
+    }
+
+    if (!is.numeric(tau.alpha.a) || tau.alpha.a <= 0) {
+        stop("'tau.alpha.a' must be positive and numeric.")
+    }
+    if (!is.numeric(tau.alpha.b) || tau.alpha.b <= 0) {
+        stop("'tau.alpha.b' must be positive and numeric.")
+    }
+    if (!is.numeric(tau.alpha.tune) || tau.alpha.tune <= 0) {
+        stop("'tau.alpha.tune' must be positive and numeric.")
+    }
+    if (!is.numeric(tau.beta.a) || tau.beta.a <= 0) {
+        stop("'tau.beta.a' must be positive and numeric.")
+    }
+    if (!is.numeric(tau.beta.b) || tau.beta.b <= 0) {
+        stop("'tau.beta.b' must be positive and numeric.")
+    }
+    if (!is.numeric(tau.beta.tune) || tau.beta.tune <= 0) {
+        stop("'tau.beta.tune' must be positive and numeric.")
+    }
     if (!is.numeric(theta.alpha.a) || theta.alpha.a <= 0) {
-        stop("'theta.alpha.a' must be positive.")
+        stop("'theta.alpha.a' must be positive and numeric.")
     }
     if (!is.numeric(theta.alpha.b) || theta.alpha.b <= 0) {
-        stop("'theta.alpha.b' must be positive.")
+        stop("'theta.alpha.b' must be positive and numeric.")
+    }
+    if (!is.numeric(theta.alpha.tune) || theta.alpha.tune <= 0) {
+        stop("'theta.alpha.tune' must be positive and numeric.")
     }
     if (!is.numeric(theta.beta.a) || theta.beta.a <= 0) {
-        stop("'theta.beta.a' must be positive.")
+        stop("'theta.beta.a' must be positive and numeric.")
     }
     if (!is.numeric(theta.beta.b) || theta.beta.b <= 0) {
-        stop("'theta.beta.b' must be positive.")
+        stop("'theta.beta.b' must be positive and numeric.")
+    }
+    if (!is.numeric(theta.beta.tune) || theta.beta.tune <= 0) {
+        stop("'theta.beta.tune' must be positive and numeric.")
+    }
+    if (!is.numeric(omega.a) || omega.a <= 0) {
+        stop("'omega.a' must be positive and numeric.")
+    }
+    if (!is.numeric(omega.b) || omega.b <= 0) {
+        stop("'omega.b' must be positive and numeric.")
+    }
+    if (!is.logical(verbose)) {
+        stop("'verbose' must be TRUE/FALSE.")
     }
     if (!is.numeric(verbose.iter) || verbose.iter < 1) {
         stop("'verbose.iter' must be a positive integer.")
     }
-    
     # checks for initial values
-    if (!is.numeric(theta.alpha.init) || !is.numeric(theta.beta.init)) {
-        stop("Initial values for 'theta.alpha.init' and 'theta.beta.init' must be numeric.")
+    if (!is.numeric(rho.alpha.init) || rho.alpha.init <= 0 || rho.alpha.init >= 1) {
+        stop("'rho.alpha.init' must be between 0 and 1 and numeric.")
     }
-    if (!is.numeric(rho.alpha.init) || !is.numeric(rho.beta.init)) {
-        stop("Initial values for 'rho.alpha.init' and 'rho.beta.init' must be numeric.")
+    if (!is.numeric(rho.beta.init) || rho.beta.init <= 0 || rho.beta.init >= 1) {
+        stop("'rho.beta.init' must be between 0 and 1 and numeric.")
+    }
+    if (!is.numeric(theta.alpha.init) || theta.alpha.init <= 0) {
+        stop("'theta.alpha.init' must be positive and numeric.")
+    }
+    if (!is.numeric(theta.beta.init) || theta.beta.init <= 0) {
+        stop("'theta.beta.init' must be positive and numeric.")
     }
 
     if (min(table(space.id)) < cv.object$num.folds) {
@@ -270,44 +319,54 @@ grm_cv <- function(
         coords.train <- coords[train.id, ]
         coords.test <- coords[test.id, ]
    
-        fit.cv <- grm(Y = Y.train, 
-                     X = X.train, 
-                     L = L.train, 
-                     M = M.train, 
-                     coords = coords.train,
-                     space.id = space.id.train.temp, 
-                     time.id = time.id.train, 
-                     spacetime.id = spacetime.id.train, 
-                     include.additive.temporal.effect = include.additive.temporal.effect,
-                     include.additive.spatial.effect = include.additive.spatial.effect,
-                     include.multiplicative.temporal.effect = include.multiplicative.temporal.effect,
-                     include.multiplicative.spatial.effect = include.multiplicative.spatial.effect,
-                     n.iter = n.iter,
-                     burn = burn,
-                     thin = thin,
-                     covariance = covariance,
-                     covariance.kernal = covariance.kernal,
-                     matern.nu = matern.nu,
-                     tau.alpha.a = tau.alpha.a,
-                     tau.alpha.b = tau.alpha.b,
-                     tau.beta.a = tau.beta.a,
-                     tau.beta.b = tau.beta.b,
-                     omega.a = omega.a,
-                     omega.b = omega.b,
-                     theta.alpha.tune = theta.alpha.tune, 
-                     theta.alpha.a = theta.alpha.a, 
-                     theta.alpha.b = theta.alpha.b,
-                     theta.alpha.init = theta.alpha.init,
-                     theta.beta.tune = theta.beta.tune, 
-                     theta.beta.a = theta.beta.a, 
-                     theta.beta.b = theta.beta.b,
-                     theta.beta.init = theta.beta.init,
-                     rho.alpha.init = rho.alpha.init,
-                     rho.beta.init = rho.beta.init,
-                     sigma.a = sigma.a, 
-                     sigma.b = sigma.b,
-                     verbose = verbose,
-                     verbose.iter = verbose.iter)
+        fit.cv <- grm(
+            Y = Y.train, 
+            X = X.train, 
+            L = L.train, 
+            M = M.train, 
+            coords = coords.train,
+            space.id = space.id.train.temp, 
+            time.id = time.id.train, 
+            spacetime.id = spacetime.id.train, 
+            include.additive.temporal.effect = include.additive.temporal.effect,
+            include.additive.spatial.effect = include.additive.spatial.effect,
+            include.multiplicative.temporal.effect = include.multiplicative.temporal.effect,
+            include.multiplicative.spatial.effect = include.multiplicative.spatial.effect,
+            nngp = nngp,
+            number.neighbors = number.neighbors,
+            discrete.theta.alpha.values = discrete.theta.alpha.values,
+            discrete.theta.beta.values = discrete.theta.beta.values,
+            discrete.theta.gibbs = discrete.theta.gibbs,
+            n.iter = n.iter,
+            burn = burn,
+            thin = thin,
+            covariance = covariance,
+            covariance.kernal = covariance.kernal,
+            matern.nu = matern.nu,
+            tau.alpha.tune = tau.alpha.tune,
+            tau.alpha.a = tau.alpha.a,
+            tau.alpha.b = tau.alpha.b,
+            tau.beta.tune = tau.beta.tune,
+            tau.beta.a = tau.beta.a,
+            tau.beta.b = tau.beta.b,
+            omega.a = omega.a,
+            omega.b = omega.b,
+            theta.alpha.tune = theta.alpha.tune, 
+            theta.alpha.a = theta.alpha.a, 
+            theta.alpha.b = theta.alpha.b,
+            theta.alpha.init = theta.alpha.init,
+            theta.beta.tune = theta.beta.tune, 
+            theta.beta.a = theta.beta.a, 
+            theta.beta.b = theta.beta.b,
+            theta.beta.init = theta.beta.init,
+            rho.alpha.init = rho.alpha.init,
+            rho.beta.init = rho.beta.init,
+            sigma.a = sigma.a, 
+            sigma.b = sigma.b,
+            sigma.fix.iter.num = sigma.fix.iter.num,
+            verbose = verbose,
+            verbose.iter = verbose.iter
+        )
     
         in_sample <- if (cv.object$type == "ordinary") {
 

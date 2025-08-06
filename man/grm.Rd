@@ -17,7 +17,11 @@ grm(
   include.additive.spatial.effect = T,
   include.multiplicative.temporal.effect = T,
   include.multiplicative.spatial.effect = T,
-  num_neighbors = 10,
+  nngp = F,
+  number.neighbors = 10,
+  discrete.theta.alpha.values = NULL,
+  discrete.theta.beta.values = NULL,
+  discrete.theta.gibbs = T,
   n.iter = 25000,
   burn = 5000,
   thin = 4,
@@ -26,8 +30,10 @@ grm(
   matern.nu = 1.5,
   tau.alpha.a = 0.5,
   tau.alpha.b = 0.005,
+  tau.alpha.tune = 0.2,
   tau.beta.a = 0.5,
   tau.beta.b = 0.005,
+  tau.beta.tune = 0.2,
   omega.a = 0.5,
   omega.b = 0.005,
   theta.alpha.tune = 0.2,
@@ -42,6 +48,7 @@ grm(
   rho.beta.init = 0.9999,
   sigma.a = 0.001,
   sigma.b = 0.001,
+  sigma.fix.iter.num = 0,
   verbose = TRUE,
   verbose.iter = 1000
 )
@@ -71,7 +78,15 @@ grm(
 
 \item{include.multiplicative.spatial.effect}{Include multiplicative spatial random effects.}
 
-\item{num_neighbors}{Number of nearest neighbors to use in NNGP}
+\item{nngp}{Use nearest neighbor Gaussian process (NNGP) in place of Gaussian process}
+
+\item{number.neighbors}{Number of nearest neighbors to use in NNGP}
+
+\item{discrete.theta.alpha.values}{Values of theta (GP intercept range parameter) to use in discrete uniform prior. If NULL (default) continuous theta prior is used}
+
+\item{discrete.theta.beta.values}{Values of theta (GP slope range parameter) to use in discrete uniform prior. If NULL (default) continuous theta prior is used}
+
+\item{discrete.theta.gibbs}{If TRUE, use Gibbs sampling to sample theta.alpha and theta.beta. If FALSE, use Metropolis-Hastings (jump's to nearest discrete values)}
 
 \item{n.iter}{Number of iterations used in predictions.}
 
@@ -89,9 +104,13 @@ grm(
 
 \item{tau.alpha.b}{Second tau alpha prior hyperparameter}
 
+\item{tau.alpha.tune}{Tau alpha Metropolis-Hastings proposal tuning parameter, only used if discrete.theta.alpha.values = T}
+
 \item{tau.beta.a}{First tau beta prior hyperparameter}
 
 \item{tau.beta.b}{Second tau beta prior hyperparameter}
+
+\item{tau.beta.tune}{Tau beta Metropolis-Hastings proposal tuning parameter, only used if discrete.theta.beta.values = T}
 
 \item{omega.a}{First omega prior hyperparameter}
 
@@ -120,6 +139,8 @@ grm(
 \item{sigma.a}{First sigma prior hyperparameter}
 
 \item{sigma.b}{Second sigma prior hyperparameter}
+
+\item{sigma.fix.iter.num}{Fix sigma for first sigma.fix.iter.num iterations}
 
 \item{verbose}{Print MCMC output}
 
