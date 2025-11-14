@@ -874,7 +874,7 @@ grm <- function(
                                      tau.alpha.a, 
                                      tau.alpha.b, 
                                      log = T) + 
-                        dgamma(theta_alpha_prop, 
+                        stats::dgamma(theta_alpha_prop, 
                                       theta.alpha.a, 
                                       theta.alpha.b, 
                                       log = T) + 
@@ -885,7 +885,7 @@ grm <- function(
                                       tau.alpha.a, 
                                       tau.alpha.b, 
                                       log = T) - 
-                        dgamma(theta_alpha, 
+                        stats::dgamma(theta_alpha, 
                                       theta.alpha.a, 
                                       theta.alpha.b, 
                                       log = T) - 
@@ -1901,7 +1901,7 @@ grm <- function(
             omega_alpha = 1 / stats::rgamma(1, N.time / 2 + omega.a, (SS1 - rho_alpha * SS2) / 2 + omega.b)
             
             #Update rho_alpha
-            R = detpart + 0.5 * omega_alpha * canrho * c(SS2)
+            R = detpart + 0.5 / omega_alpha * canrho * c(SS2)
             rho_alpha = sample(canrho, 1, prob = exp(R - max(R)))
         }
 
@@ -1921,7 +1921,7 @@ grm <- function(
             omega_beta = 1 / stats::rgamma(1, N.time / 2 + omega.a, (SS1 - rho_beta * SS2) / 2 + omega.b)
             
             #Update rho_beta
-            R = detpart + 0.5 * omega_beta * canrho * c(SS2)
+            R = detpart + 0.5 / omega_beta * canrho * c(SS2)
             rho_beta = sample(canrho, 1, prob = exp(R - max(R)))
         }
     

@@ -36,6 +36,7 @@ library(ensembleDownscaleR)
 
 ?cmaq_aqs_matched
 
+plot(cmaq_fit$others$rho.alpha, type = "l")
 cmaq_fit <- grm(
     Y = cmaq_aqs_matched$pm25,
     X = cmaq_aqs_matched$ctm,
@@ -43,8 +44,8 @@ cmaq_fit <- grm(
                              "hwy_length", "lim_hwy_length", 
                              "local_rd_length", "point_emi_any")],
     M = cmaq_aqs_matched[, c("tmp", "wind")],
-    n.iter = 50,
-    burn = 10,
+    n.iter = 500,
+    burn = 100,
     thin = 4,
     covariance = "matern",
     matern.nu = 0.5,
@@ -65,8 +66,8 @@ modis_fit <- grm(
                               "local_rd_length", "point_emi_any")],
     M = modis_aqs_matched[, c("tmp", "wind", "cmaq", "tempaod", 
                               "windaod", "elevationaod")],
-    n.iter = 50,
-    burn = 10,
+    n.iter = 500,
+    burn = 100,
     thin = 4,
     coords = modis_aqs_matched[, c("x", "y")],
     space.id = modis_aqs_matched$space_id,
@@ -93,7 +94,7 @@ cmaq_pred <- grm_pred(
     time.id = cmaq_full$time_id,
     space.id = cmaq_full$space_id,
     spacetime.id = cmaq_full$spacetime_id,
-    n.iter = 10,
+    n.iter = 100,
     verbose = T
 )
 
@@ -111,7 +112,7 @@ modis_pred <- grm_pred(
     time.id = modis_full$time_id, 
     space.id = modis_full$space_id, 
     spacetime.id = modis_full$spacetime_id,
-    n.iter = 10,
+    n.iter = 100,
     verbose = T)
 ```
 
@@ -134,8 +135,8 @@ cmaq_fit_cv <- grm_cv(
                              "hwy_length", "lim_hwy_length", 
                              "local_rd_length", "point_emi_any")],
     M = cmaq_aqs_matched[, c("tmp", "wind")],
-    n.iter = 50,
-    burn = 10,
+    n.iter = 500,
+    burn = 100,
     thin = 4,
     coords = cmaq_aqs_matched[, c("x", "y")],
     space.id = cmaq_aqs_matched$space_id,
@@ -159,8 +160,8 @@ modis_fit_cv <- grm_cv(
                               "local_rd_length", "point_emi_any")],
     M = modis_aqs_matched[, c("tmp", "wind", "cmaq", "tempaod", 
                               "windaod", "elevationaod")],
-    n.iter = 50,
-    burn = 10,
+    n.iter = 500,
+    burn = 100,
     thin = 4,
     coords = modis_aqs_matched[, c("x", "y")],
     space.id = modis_aqs_matched$space_id,
@@ -176,8 +177,8 @@ modis_fit_cv <- grm_cv(
 ensemble_fit <- ensemble_spatial(
     grm.fit.cv.1 = cmaq_fit_cv,
     grm.fit.cv.2 = modis_fit_cv,
-    n.iter = 50, 
-    burn = 10, 
+    n.iter = 500, 
+    burn = 100,
     thin = 4,
     tau.a = 0.001, 
     tau.b = 0.001, 
