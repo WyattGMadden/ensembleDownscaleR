@@ -36,7 +36,6 @@ library(ensembleDownscaleR)
 
 ?cmaq_aqs_matched
 
-plot(cmaq_fit$others$rho.alpha, type = "l")
 cmaq_fit <- grm(
     Y = cmaq_aqs_matched$pm25,
     X = cmaq_aqs_matched$ctm,

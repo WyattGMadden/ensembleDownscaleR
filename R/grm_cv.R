@@ -5,6 +5,7 @@
 #' @inheritParams grm_pred
 #' @inheritParams grm
 #' @param cv.object A named list containing cv.id, num.folds, and type. Can be created with create_cv function. 
+#' @param fit.i Fold number integer to only fit this CV fold, useful for parallelization.
 #'
 #' @return A data frame containing cross validation predictions
 #'
@@ -60,7 +61,8 @@ grm_cv <- function(
     sigma.b = 0.001,
     sigma.fix.iter.num = 0,
     verbose = TRUE,
-    verbose.iter = 1000
+    verbose.iter = 1000,
+    fit.i = NULL
     ) {
 
     #################################
@@ -245,6 +247,13 @@ grm_cv <- function(
         stop("Number of observations in each space.id must be greater than or equal to cv.object$num.folds")
 
     }
+
+    if (!is.null(fit.i)) {
+        if (!is.numeric(fit.i) || fit.i < 1 || fit.i != round(fit.i) || fit.i > cv.object$num.folds) {
+            stop("'fit.i' must be an integer between 1 and cv.object$num.folds.")
+        }
+    }
+
     cv.id <- cv.object$cv.id
 
     Y.cv <- data.frame(time.id = time.id, 
@@ -259,6 +268,9 @@ grm_cv <- function(
   
     for (cv.i in 1:cv.object$num.folds) {
     
+        #fit.i override
+        if (!is.null(fit.i)) cv.i <- fit.i
+
         print(paste0("Performing CV Experiment ---- Fold ", cv.i))
 
         if (cv.object$type == "spatial_buffered") {
@@ -398,6 +410,8 @@ grm_cv <- function(
 
         Y.cv$estimate[test.id] <- cv.results$estimate
         Y.cv$sd[test.id] <- cv.results$sd
+
+        if (!is.null(fit.i)) break
 
     }
  
