@@ -28,8 +28,6 @@ grm_pred <- function(
     space.id, 
     time.id, 
     spacetime.id, 
-    include.additive.spatial.effect = T,
-    include.multiplicative.spatial.effect = T,
     n.iter = 500,
     verbose = TRUE,
     in.sample = FALSE
@@ -91,10 +89,6 @@ grm_pred <- function(
         stop("'spacetime.id' must have the same length as 'X'.")
     }
 
-    # Boolean checks for includes
-    if (!is.logical(include.additive.spatial.effect) || !is.logical(include.multiplicative.spatial.effect)) {
-        stop("'include.additive.spatial.effect' and 'include.multiplicative.spatial.effect' must be TRUE/FALSE.")
-    }
 
     # n.iter checks
     if (!is.numeric(n.iter) || n.iter < 1) {
@@ -226,7 +220,7 @@ grm_pred <- function(
 
             
             #For alpha's
-            if (include.additive.spatial.effect) {
+            if (grm.fit$include.additive.spatial.effect) {
 
               if (verbose == TRUE) {
 
@@ -269,7 +263,8 @@ grm_pred <- function(
             }
              
             #For betas's
-            if (include.multiplicative.spatial.effect) { 
+            if (grm.fit$include.multiplicative.spatial.effect) { 
+
                 if (verbose == TRUE) {
                     cat("Imputing Spatial Betas\n") 
                 }
@@ -348,7 +343,7 @@ grm_pred <- function(
             beta_space_pred[paste0("Sample", 1:n.iter)] <- 0
             
             #For alpha's
-            if (include.additive.spatial.effect) {
+            if (grm.fit$include.additive.spatial.effect) {
 
               if (verbose == TRUE) {
 
@@ -400,7 +395,7 @@ grm_pred <- function(
             }
              
             #For betas's
-            if (include.multiplicative.spatial.effect) { 
+            if (grm.fit$include.multiplicative.spatial.effect) { 
 
                 if (verbose == TRUE) {
                     cat("Imputing Spatial Betas\n") 

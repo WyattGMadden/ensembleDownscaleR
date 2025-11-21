@@ -2108,7 +2108,11 @@ grm <- function(
          discrete.theta.alpha.info = discrete.theta.alpha.info.save,
          discrete.theta.beta.info = discrete.theta.beta.info.save,
          cov_kern = cov_kern,
-         locations = locs)
+         locations = locs,
+         include.additive.temporal.effect = include.additive.temporal.effect,
+         include.multiplicative.temporal.effect = include.multiplicative.temporal.effect,
+         include.additive.spatial.effect = include.additive.spatial.effect,
+         include.multiplicative.spatial.effect = include.multiplicative.spatial.effect)
 }
 
 
