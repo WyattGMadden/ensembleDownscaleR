@@ -183,6 +183,7 @@ grm <- function(
     if (covariance == "custom" && !is.function(covariance.kernal)) {
         stop("If 'covariance' is 'custom', 'covariance.kernal' must be a valid function.")
     }
+    matern.nu <- as.numeric(matern.nu)
     if (covariance == "matern" && !(matern.nu %in% c(0.5, 1.5, 2.5))) {
         stop("'matern.nu' must be 0.5, 1.5, or 2.5 when 'covariance' is 'matern'.")
     }
