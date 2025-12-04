@@ -138,8 +138,9 @@ create_cv_original <- function(time.id,
 
         for (i in space_spacetime_id) {
 
-            # make sure no space/spacetime is not in some but not all folds
-            if (sum(space_spacetime_key == i) < num.folds) {
+            # make sure all space/spacetime combos are in at least 2 folds
+            # ensuring estimability of spatial random effects during cv fitting
+            if (sum(space_spacetime_key == i) < 2) {
 
                 cv_id[space_spacetime_key == i] <- rep(0, sum(space_spacetime_key == i))
 
@@ -148,8 +149,11 @@ create_cv_original <- function(time.id,
                 #number of observations in site i for cv
                 obs_for_site_i <- sum(space_spacetime_key == i) 
 
+                # avoids earlier folds containing more space/spacetime ids than later folds
+                folds_shuffled <- sample(1:num.folds)
+
                 #unshuffled cv id's with (almost) equal number of observations in each fold
-                cv_id_i <- (1:num.folds)[(1:obs_for_site_i) %% num.folds + 1]
+                cv_id_i <- (folds_shuffled)[(1:obs_for_site_i - 1) %% num.folds + 1]
 
                 #shuffle cv id's
                 cv_id_i <- sample(cv_id_i, replace = F)

@@ -1057,13 +1057,13 @@ grm <- function(
                         }
 
                         ratio <- lik_prop + 
-                            dgamma(theta_alpha_prop, 
+                            stats::dgamma(theta_alpha_prop, 
                                           theta.alpha.a, 
                                           theta.alpha.b, 
                                           log = T) + 
                             log(discrete_theta_alpha_mh_jump$lik_jump_prop_to_curr) -
                             lik_cur - 
-                            dgamma(theta_alpha, 
+                            stats::dgamma(theta_alpha, 
                                           theta.alpha.a, 
                                           theta.alpha.b, 
                                           log = T) - 
@@ -1098,7 +1098,7 @@ grm <- function(
 
                         }
 
-                        lik <- lik + dgamma(discrete.theta.alpha.values, 
+                        lik <- lik + stats::dgamma(discrete.theta.alpha.values, 
                                                    theta.alpha.a, 
                                                    theta.alpha.b, 
                                                    log = T)
@@ -1169,13 +1169,13 @@ grm <- function(
                     }
               
                     ratio <- lik.prop + 
-                        dgamma(theta.prop, 
+                        stats::dgamma(theta.prop, 
                                       theta.alpha.a, 
                                       theta.alpha.b, 
                                       log = T) + 
                             log(theta.prop) -
                             lik.curr - 
-                            dgamma(theta_alpha, 
+                            stats::dgamma(theta_alpha, 
                                           theta.alpha.a, 
                                           theta.alpha.b, 
                                           log = T) - 
@@ -1265,13 +1265,13 @@ grm <- function(
 
 
                         ratio <- lik.prop + 
-                            dgamma(theta_alpha_prop, 
+                            stats::dgamma(theta_alpha_prop, 
                                           theta.alpha.a, 
                                           theta.alpha.b, 
                                           log = T) + 
                             log(discrete_theta_alpha_mh_jump$lik_jump_prop_to_curr) -
                             lik.curr - 
-                            dgamma(theta_alpha, 
+                            stats::dgamma(theta_alpha, 
                                           theta.alpha.a, 
                                           theta.alpha.b, 
                                           log = T) -
@@ -1309,7 +1309,7 @@ grm <- function(
                                                 SSS_chol_inv,
                                                 SSS_det)
                         }
-                        lik <- lik + dgamma(discrete.theta.alpha.values, 
+                        lik <- lik + stats::dgamma(discrete.theta.alpha.values, 
                                                    theta.alpha.a, 
                                                    theta.alpha.b, 
                                                    log = T)
@@ -1434,7 +1434,7 @@ grm <- function(
                                       tau.beta.a, 
                                       tau.beta.b, 
                                       log = T) + 
-                        dgamma(theta_beta_prop, 
+                        stats::dgamma(theta_beta_prop, 
                                       theta.beta.a, 
                                       theta.beta.b, 
                                       log = T) + 
@@ -1446,7 +1446,7 @@ grm <- function(
                                       tau.beta.b, 
                                       log = T) - 
                         #log-normal
-                        dgamma(theta_beta, 
+                        stats::dgamma(theta_beta, 
                                       theta.beta.a, 
                                       theta.beta.b, 
                                       log = T) - 
@@ -1615,13 +1615,13 @@ grm <- function(
                         }
 
                         ratio <- lik_prop + 
-                            dgamma(theta_beta_prop, 
+                            stats::dgamma(theta_beta_prop, 
                                           theta.beta.a, 
                                           theta.beta.b, 
                                           log = T) + 
                             log(discrete_theta_beta_mh_jump$lik_jump_prop_to_curr) -
                             lik_cur - 
-                            dgamma(theta_beta, 
+                            stats::dgamma(theta_beta, 
                                           theta.beta.a, 
                                           theta.beta.b, 
                                           log = T) - 
@@ -1656,7 +1656,7 @@ grm <- function(
 
                         }
 
-                        lik <- lik + dgamma(discrete.theta.beta.values, 
+                        lik <- lik + stats::dgamma(discrete.theta.beta.values, 
                                                    theta.beta.a, 
                                                    theta.beta.b, 
                                                    log = T)
@@ -1727,13 +1727,13 @@ grm <- function(
                     }
               
                     ratio <- lik.prop + 
-                        dgamma(theta.prop,  
+                        stats::dgamma(theta.prop,  
                                       theta.beta.a, 
                                       theta.beta.b, 
                                       log = T) + 
                         log(theta.prop) -
                         lik.curr - 
-                        dgamma(theta_beta, 
+                        stats::dgamma(theta_beta, 
                                       theta.beta.a, 
                                       theta.beta.b, 
                                       log = T) - 
@@ -1826,13 +1826,13 @@ grm <- function(
                         }
 
                         ratio <- lik.prop + 
-                            dgamma(theta_beta_prop, 
+                            stats::dgamma(theta_beta_prop, 
                                           theta.beta.a, 
                                           theta.beta.b, 
                                           log = T) + 
                             log(discrete_theta_beta_mh_jump$lik_jump_prop_to_curr) -
                             lik.curr - 
-                            dgamma(theta_beta, 
+                            stats::dgamma(theta_beta, 
                                           theta.beta.a, 
                                           theta.beta.b, 
                                           log = T) -
@@ -1871,7 +1871,7 @@ grm <- function(
                                                 SSS_det)
                         }
 
-                        lik <- lik + dgamma(discrete.theta.beta.values, 
+                        lik <- lik + stats::dgamma(discrete.theta.beta.values, 
                                                    theta.beta.a, 
                                                    theta.beta.b, 
                                                    log = T)
