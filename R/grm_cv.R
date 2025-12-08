@@ -242,11 +242,13 @@ grm_cv <- function(
         stop("'theta.beta.init' must be positive and numeric.")
     }
 
-    if (min(table(space.id)) < 2) {
+    if (min(table(space.id, spacetime.id)) < 2) {
 
-        stop("Number of observations in each space.id must be at least 2.")
+        stop("Number of observations in each space.id/spacetime.id combination must be at least 2.")
 
     }
+
+    min(table(c(1, 2, 3), c(4, 5, 6)))
 
     if (!is.null(fit.i)) {
         if (!is.numeric(fit.i) || fit.i < 1 || fit.i != round(fit.i) || fit.i > cv.object$num.folds) {
