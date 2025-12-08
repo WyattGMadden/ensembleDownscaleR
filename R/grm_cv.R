@@ -242,9 +242,9 @@ grm_cv <- function(
         stop("'theta.beta.init' must be positive and numeric.")
     }
 
-    if (min(table(space.id)) < cv.object$num.folds) {
+    if (min(table(space.id)) < 2) {
 
-        stop("Number of observations in each space.id must be greater than or equal to cv.object$num.folds")
+        stop("Number of observations in each space.id must be at least 2.")
 
     }
 
