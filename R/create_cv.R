@@ -133,35 +133,37 @@ create_cv_original <- function(time.id,
 
     } else if (type == "ordinary") {
 
+
         space_spacetime_key <- paste(space_id_cv, spacetime_id_cv)
         space_spacetime_id <- unique(space_spacetime_key)
 
         for (i in space_spacetime_id) {
 
             # make sure all space/spacetime combos are in at least 2 folds
-            # ensuring estimability of spatial random effects during cv fitting
-            if (sum(space_spacetime_key == i) < 2) {
 
-                cv_id[space_spacetime_key == i] <- rep(0, sum(space_spacetime_key == i))
+            #number of observations in site i for cv
+            obs_for_site_i <- sum(space_spacetime_key == i) 
 
-            } else {
+            # avoids earlier folds containing more space/spacetime ids than later folds
+            folds_shuffled <- sample(1:num.folds)
 
-                #number of observations in site i for cv
-                obs_for_site_i <- sum(space_spacetime_key == i) 
+            #unshuffled cv id's with (almost) equal number of observations in each fold
+            cv_id_i <- (folds_shuffled)[(1:obs_for_site_i - 1) %% num.folds + 1]
 
-                # avoids earlier folds containing more space/spacetime ids than later folds
-                folds_shuffled <- sample(1:num.folds)
-
-                #unshuffled cv id's with (almost) equal number of observations in each fold
-                cv_id_i <- (folds_shuffled)[(1:obs_for_site_i - 1) %% num.folds + 1]
-
-                #shuffle cv id's
-                cv_id_i <- sample(cv_id_i, replace = F)
-            
-                cv_id[space_spacetime_key == i] <- cv_id_i
-            }
+            #shuffle cv id's
+            cv_id_i <- sample(cv_id_i, replace = F)
+        
+            cv_id[space_spacetime_key == i] <- cv_id_i
         
         }
+
+        # set cv fold to zero for any space id that does not 
+        # have at least 2 observations in each spacetime id
+        space_to_remove_log <- rowSums(table(space_id_cv, spacetime_id_cv) < 2) != 0
+        space_to_remove <- as.integer(names(space_to_remove_log)[space_to_remove_log])
+
+        # set cv id to 0 for these space id's
+        cv_id[space_id_cv %in% space_to_remove] <- 0
             
 
     } else if (type == "spatial_clustered") {

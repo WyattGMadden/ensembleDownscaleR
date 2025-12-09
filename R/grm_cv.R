@@ -248,7 +248,6 @@ grm_cv <- function(
 
     }
 
-    min(table(c(1, 2, 3), c(4, 5, 6)))
 
     if (!is.null(fit.i)) {
         if (!is.numeric(fit.i) || fit.i < 1 || fit.i != round(fit.i) || fit.i > cv.object$num.folds) {
