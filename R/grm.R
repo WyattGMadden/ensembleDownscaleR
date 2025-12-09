@@ -637,7 +637,7 @@ grm <- function(
     if (is.null(discrete.theta.alpha.values)) {
         theta_alpha <- theta.alpha.init
     }
-    if (is.null(discrete.theta.alpha.values)) {
+    if (is.null(discrete.theta.beta.values)) {
         theta_beta <- theta.beta.init
     }
     rho_alpha <- rho.alpha.init
@@ -1588,7 +1588,7 @@ grm <- function(
                         theta_beta_prop <- discrete.theta.beta.values[[which_theta_prop_beta]]
 
                         kern_prop <- dnngpkernsbeta$kernals_beta[[which_theta_prop_beta]]
-                        kern_inv_prop <- dnngpkernsbeta$kernals_inv_alpha[[which_theta_prop_beta]]
+                        kern_inv_prop <- dnngpkernsbeta$kernals_inv_beta[[which_theta_prop_beta]]
                         kern_partial_inv_prop <- dnngpkernsbeta$kernals_partial_inv_beta[[which_theta_prop_beta]]
 
                         lik_prop <- 0
