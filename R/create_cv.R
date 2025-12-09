@@ -139,6 +139,7 @@ create_cv_original <- function(time.id,
 
         for (i in space_spacetime_id) {
 
+            i <- space_spacetime_id[1]
             # make sure all space/spacetime combos are in at least 2 folds
 
             #number of observations in site i for cv
@@ -151,7 +152,9 @@ create_cv_original <- function(time.id,
             cv_id_i <- (folds_shuffled)[(1:obs_for_site_i - 1) %% num.folds + 1]
 
             #shuffle cv id's
-            cv_id_i <- sample(cv_id_i, replace = F)
+            if (length(cv_id_i) > 1) {
+                cv_id_i <- sample(cv_id_i, replace = F)
+            }
         
             cv_id[space_spacetime_key == i] <- cv_id_i
         
