@@ -139,7 +139,6 @@ create_cv_original <- function(time.id,
 
         for (i in space_spacetime_id) {
 
-            i <- space_spacetime_id[1]
             # make sure all space/spacetime combos are in at least 2 folds
 
             #number of observations in site i for cv
