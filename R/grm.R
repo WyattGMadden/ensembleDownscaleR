@@ -17,8 +17,8 @@
 #' @param include.multiplicative.spatial.effect Include multiplicative spatial random effects.
 #' @param nngp Use nearest neighbor Gaussian process (NNGP) in place of Gaussian process
 #' @param number.neighbors Number of nearest neighbors to use in NNGP
-#' @param discrete.theta.alpha.values Values of theta (GP intercept range parameter) to use in discrete uniform prior. If NULL (default) continuous theta prior is used
-#' @param discrete.theta.beta.values Values of theta (GP slope range parameter) to use in discrete uniform prior. If NULL (default) continuous theta prior is used
+#' @param discrete.theta.alpha.values Discretized values of theta (GP intercept range parameter). If NULL (default) continuous theta prior is used
+#' @param discrete.theta.beta.values Discretized values of theta (GP slope range parameter). If NULL (default) continuous theta prior is used
 #' @param discrete.theta.gibbs If TRUE, use Gibbs sampling to sample theta.alpha and theta.beta. If FALSE, use Metropolis-Hastings (jump's to nearest discrete values)
 #' @param n.iter Number of iterations used in predictions. 
 #' @param burn Number of pre-covergence simulations

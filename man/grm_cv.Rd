@@ -86,9 +86,9 @@ grm_cv(
 
 \item{number.neighbors}{Number of nearest neighbors to use in NNGP}
 
-\item{discrete.theta.alpha.values}{Values of theta (GP intercept range parameter) to use in discrete uniform prior. If NULL (default) continuous theta prior is used}
+\item{discrete.theta.alpha.values}{Discretized values of theta (GP intercept range parameter). If NULL (default) continuous theta prior is used}
 
-\item{discrete.theta.beta.values}{Values of theta (GP slope range parameter) to use in discrete uniform prior. If NULL (default) continuous theta prior is used}
+\item{discrete.theta.beta.values}{Discretized values of theta (GP slope range parameter). If NULL (default) continuous theta prior is used}
 
 \item{discrete.theta.gibbs}{If TRUE, use Gibbs sampling to sample theta.alpha and theta.beta. If FALSE, use Metropolis-Hastings (jump's to nearest discrete values)}
 
