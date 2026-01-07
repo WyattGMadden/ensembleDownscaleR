@@ -324,7 +324,7 @@ grm_pred <- function(
             ordered_coords_Y <- nngp_info$ordered.coords
             neighbors_pred <- get_neighbors_ref(ordered_coords = nngp_info$ordered.coords, 
                                                 locations.pred, 
-                                                nngp_info$num_neighbors)
+                                                nngp_info$number.neighbors)
 
             dist_mats_pred <- get_dist_matrices_ref(ordered_coords = nngp_info$ordered.coords, 
                                                     coords_pred = locations.pred,

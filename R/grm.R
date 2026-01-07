@@ -2066,7 +2066,7 @@ grm <- function(
                                coord.reverse.ordering = nngp_utils$coord_reverse_ordering,
                                neighbors = neighbors,
                                dist.matrices = dist_matrices,
-                               neighbors_inverse = neighbors_inverse,
+                               neighbors.inverse = neighbors_inverse,
                                space.to.spacetime.assign = space_to_spacetime_assign,
                                number.neighbors = number.neighbors)
         discrete.theta.alpha.info.save <- NULL
