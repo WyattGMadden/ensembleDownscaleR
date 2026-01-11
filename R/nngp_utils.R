@@ -47,6 +47,55 @@ get_neighbors_inverse <- function(neighbors) {
     return(neighbors_inverse)
 }
 
+### get neighbors position
+### get list of position in neighbors for each location/neighbor set
+### to avoid repeated which(neighbors[[tt]] == s) in later spatial
+### effects fitting
+### ie list of vectors of length N.space,
+### where each vector indicates zero of that location is not a neighbor
+### and is the neighbor number if it is a neighbor
+get_neighbor_positions <- function(neighbors){
+    N.space <- length(neighbors)
+    pos_in_neighbors <- vector("list", length(N.space))
+
+    for (s in seq_len(N.space)) {
+        pos <- rep(0, N.space)
+        neighbor_s <- neighbors[[s]]
+        if (length(neighbor_s) > 0) {
+            pos[neighbor_s] <- seq_along(neighbor_s)
+        }
+        pos_in_neighbors[[s]] <- pos
+    }
+    return(pos_in_neighbors)
+}
+
+get_F_and_B <- function(kernels, tau, neighbors, kernels_partial_inverse){
+
+    F_s <- rep(0, length(kernels))
+    B_s <- list()
+
+    for (s in 1:length(kernels)) {
+
+        SSS_s <- tau * kernels[[s]]
+        F_s[s] <- SSS_s[1, 1]
+        B_s[[s]] <- rep(0, length(neighbors[[s]]))
+
+        #if there are neighbors
+        if (length(neighbors[[s]]) > 0) {
+
+            B_s[[s]] <- as.numeric(kernels[[s]][1, -1, drop = FALSE] %*% kernels_partial_inverse[[s]])
+            F_s[s] <- tau * (kernels[[s]][1,1] - B_s[[s]] %*% kernels[[s]][-1,1])
+
+        } else {
+
+            B_s[[s]] <- numeric(0)
+            F_s[s] <- tau * kernels[[s]][1,1]
+
+        }
+    }
+    return(list("B" = B_s, "F" = F_s))
+}
+
 #get neighbors from a reference set of ordered coordinates
 get_neighbors_ref <- function(ordered_coords, pred_coords, m){
     neighbors_pred <- list()
@@ -171,4 +220,50 @@ dnngp_discrete_theta <- function(y, neighbors, dist_matrices, phi, which_theta, 
 }
 
 
+
+mcmc_draw_spatial_nngp <- function(
+    spatial_effect, 
+    sigma2,
+    neighbors,
+    neighbors_inverse,
+    pos_in_neighbors,
+    B_s,
+    F_s,
+    covariate_sums,
+    resid_sums
+    ){
+
+    for (s in 1:length(spatial_effect)) {
+
+        sum_B_F_inv_B <- 0
+        sum_B_F_inv_a <- 0
+        for (tt in neighbors_inverse[[s]]) {
+            B_tt <- B_s[[tt]]
+            B_tts <- B_tt[pos_in_neighbors[[tt]][s]]
+            F_tt <- F_s[tt]
+
+            a_tt_s <- spatial_effect[tt]
+            for (l in neighbors[[tt]]) {
+                if (l != s) {
+                    a_tt_s <- a_tt_s - B_tt[pos_in_neighbors[[tt]][l]] * spatial_effect[l]
+                }
+            }
+
+            sum_B_F_inv_B <- sum_B_F_inv_B + B_tts^2 / F_tt
+            sum_B_F_inv_a <- sum_B_F_inv_a + B_tts * (1 / F_tt) * a_tt_s
+        }
+
+        V_s <- (1 / sigma2 * covariate_sums[s] + (1 / F_s[s]) + sum_B_F_inv_B) ^ (-1)
+        mu_s <- resid_sums[s] + sum_B_F_inv_a
+        if (length(neighbors[[s]]) > 0) {
+            mu_s <- mu_s + (1 / F_s[s]) * B_s[[s]] %*% spatial_effect[neighbors[[s]]]
+        }
+
+        spatial_effect[s] <- stats::rnorm(1, V_s * mu_s, sqrt(V_s))
+
+    }
+
+    return(spatial_effect)
+
+}
 

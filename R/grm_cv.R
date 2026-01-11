@@ -37,7 +37,7 @@ grm_cv <- function(
     burn = 5000,
     thin = 4,
     covariance = "exponential",
-    covariance.kernal = NULL,
+    covariance.kernel = NULL,
     matern.nu = 1.5,
     tau.alpha.a = 0.5,
     tau.alpha.b = 0.005,
@@ -165,8 +165,8 @@ grm_cv <- function(
     if (!is.character(covariance) || !(covariance %in% c("exponential", "matern", "custom"))) {
         stop("'covariance' must be one of 'exponential', 'matern', or 'custom'.")
     }
-    if (covariance == "custom" && !is.function(covariance.kernal)) {
-        stop("If 'covariance' is 'custom', 'covariance.kernal' must be a valid function.")
+    if (covariance == "custom" && !is.function(covariance.kernel)) {
+        stop("If 'covariance' is 'custom', 'covariance.kernel' must be a valid function.")
     }
     if (covariance == "matern" && !(matern.nu %in% c(0.5, 1.5, 2.5))) {
         stop("'matern.nu' must be 0.5, 1.5, or 2.5 when 'covariance' is 'matern'.")
@@ -354,7 +354,7 @@ grm_cv <- function(
             burn = burn,
             thin = thin,
             covariance = covariance,
-            covariance.kernal = covariance.kernal,
+            covariance.kernel = covariance.kernel,
             matern.nu = matern.nu,
             tau.alpha.tune = tau.alpha.tune,
             tau.alpha.a = tau.alpha.a,

@@ -1,13 +1,13 @@
 
-# covariance kernals and functions
+# covariance kernels and functions
 
 
-exponential_kernal <- function(distance, theta) {
+exponential_kernel <- function(distance, theta) {
     return(exp(-distance / theta))
 }
 
 
-matern_kernal <- function(distance, theta, nu) {
+matern_kernel <- function(distance, theta, nu) {
 
     if (!(nu %in% c(0.5, 1.5, 2.5))) {
         stop("nu must be one of 0.5, 1.5, or 2.5")

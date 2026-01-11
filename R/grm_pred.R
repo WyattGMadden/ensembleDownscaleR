@@ -241,7 +241,7 @@ grm_pred <- function(
                       InvSigma22.m <- solve(Sigma22.m)
                   } else {
                       which.theta.alpha <- grm.fit$discrete.theta.alpha.info$which.theta.alpha.discrete[m]
-                      InvSigma22.m <- (1 / tau.m) * grm.fit$discrete.theta.alpha.info$kernals.inv.alpha[[which.theta.alpha]]
+                      InvSigma22.m <- (1 / tau.m) * grm.fit$discrete.theta.alpha.info$kernels.inv.alpha[[which.theta.alpha]]
                   }
             
                   for (j in 1:N.spacetime) {
@@ -282,7 +282,7 @@ grm_pred <- function(
                         InvSigma22.m <- solve(Sigma22.m)
                     } else {
                       which.theta.beta <- grm.fit$discrete.theta.beta.info$which.theta.beta.discrete[m]
-                      InvSigma22.m <- (1 / tau.m) * grm.fit$discrete.theta.beta.info$kernals.inv.beta[[which.theta.beta]]
+                      InvSigma22.m <- (1 / tau.m) * grm.fit$discrete.theta.beta.info$kernels.inv.beta[[which.theta.beta]]
                   }
               
                     for (j in 1:N.spacetime) {
