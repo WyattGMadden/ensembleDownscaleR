@@ -21,7 +21,7 @@ grm(
   number.neighbors = 10,
   discrete.theta.alpha.values = NULL,
   discrete.theta.beta.values = NULL,
-  discrete.theta.gibbs = T,
+  discrete.theta.gibbs = F,
   n.iter = 25000,
   burn = 5000,
   thin = 4,
