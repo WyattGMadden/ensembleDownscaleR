@@ -8,7 +8,10 @@
 [![R-CMD-check](https://github.com/WyattGMadden/ensembleDownscaleR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/WyattGMadden/ensembleDownscaleR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of ensembleDownscaleR is to …
+The **ensembleDownscaleR** package provides software for Bayesian
+ensemble averaging of $`\text{PM}_{2.5}`$ geostatistical downscalers.
+The package is fully described
+[here](https://doi.org/10.3390/rs17111941).
 
 ## Installation
 
