@@ -199,9 +199,8 @@ grm_pred <- function(
             N.cell <- nrow(locations.pred)
             
             ####Predict alpha and beta at grid cells
-            XY <- rbind(locations.Y, locations.pred)
             D22 <- as.matrix(stats::dist(locations.Y, diag = TRUE, upper = TRUE))
-            D12 <- as.matrix(stats::dist(XY, diag = TRUE, upper = TRUE))[c(1:N.mon), -c(1:N.mon)]
+            D12 <- calculate_distances(locations.Y, locations.pred)
             
             alpha_space_pred <- data.frame(expand.grid(1:N.space, 
                                                        1:N.spacetime))
@@ -248,7 +247,14 @@ grm_pred <- function(
                       alpha.m <- grm.fit$alpha.space[grm.fit$alpha.space$spacetime.id == j, 
                                                     paste0("Sample", m)]
                       alpha.mu.m <- t(Sigma12.m) %*% InvSigma22.m %*% alpha.m
-                      alpha.cov.m <- Sigma11.m - diag(t(Sigma12.m) %*% InvSigma22.m %*% Sigma12.m)
+                      
+                      diag_values <- numeric(ncol(Sigma12.m))
+                      for (ii in 1:ncol(Sigma12.m)) {
+                          col_vector <- Sigma12.m[, ii, drop = FALSE]
+                          diag_values[ii] <- t(col_vector) %*% InvSigma22.m %*% col_vector
+                      }
+                      alpha.cov.m <- Sigma11.m - diag_values
+
                       alpha.m.post <- stats::rnorm(N.cell, alpha.mu.m, sqrt(alpha.cov.m))
                       alpha_space_pred[alpha_space_pred$spacetime.id == j, 
                                        paste0("Sample",m)] = alpha.m.post
@@ -289,9 +295,12 @@ grm_pred <- function(
                         beta.m <- grm.fit$beta.space[grm.fit$beta.space$spacetime.id == j, 
                                             paste0("Sample", m)]
                         beta.mu.m <- t(Sigma12.m) %*% InvSigma22.m %*% beta.m
-                        beta.cov.m <- Sigma11.m - diag(t(Sigma12.m) %*% 
-                                                      InvSigma22.m %*% 
-                                                      Sigma12.m)
+                        diag_values <- numeric(ncol(Sigma12.m))
+                        for (ii in 1:ncol(Sigma12.m)) {
+                            col_vector <- Sigma12.m[, ii, drop = FALSE]
+                            diag_values[ii] <- t(col_vector) %*% InvSigma22.m %*% col_vector
+                        }
+                        beta.cov.m <- Sigma11.m - diag_values
                         beta.m.post <- stats::rnorm(N.cell, beta.mu.m, sqrt(beta.cov.m))
                         beta_space_pred[beta_space_pred$spacetime.id == j, 
                                         paste0("Sample", m)] = beta.m.post
