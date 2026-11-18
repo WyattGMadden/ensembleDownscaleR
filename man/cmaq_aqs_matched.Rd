@@ -18,7 +18,7 @@ A data frame with 11,404 rows and 16 columns:
 \item{forestcover}{Percentage of forest cover spatial covariate (2001 National Land Cover database)}
 \item{hwy_length}{Sum of major roadway length spatial covariate (2001 National Land Cover database)}
 \item{lim_hwy_length}{Sum of major roadway length spatial covariate (2001 National Land Cover database)}
-\item{lim_hwy_length}{Sum of local roadway lengths spatial covariate (2001 National Land Cover database)}
+\item{local_rd_length}{Sum of local roadway lengths spatial covariate (2001 National Land Cover database)}
 \item{point_emi_any}{Indicator of PM2.5 primary emission point source spatial covariate (2002 USEPA National Emissions Inventory)}
 \item{tmp}{Temperature spatio-temporal covariate (North American Land Data Assimilation Systems)}
 \item{wind}{Wind spatio-temporal covariate (North American Land Data Assimilation Systems)}
